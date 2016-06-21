@@ -12,6 +12,7 @@ import (
 	_ "github.com/elastic/beats/packetbeat/protos/http"
 	_ "github.com/elastic/beats/packetbeat/protos/memcache"
 	_ "github.com/elastic/beats/packetbeat/protos/mongodb"
+	//_ "github.com/elastic/beats/packetbeat/protos/msrp"
 	_ "github.com/elastic/beats/packetbeat/protos/mysql"
 	_ "github.com/elastic/beats/packetbeat/protos/nfs"
 	_ "github.com/elastic/beats/packetbeat/protos/pgsql"

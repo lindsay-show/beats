@@ -189,6 +189,7 @@ func New(
 	return p, nil
 }
 func (sip *Sip) init(results publish.Transactions, config *sipConfig) error {
+	sip.setFromConfig(config)
 	sip.transactions = common.NewCacheWithRemovalListener(
 		sip.transactionTimeout,
 		protos.DefaultTransactionHashSize,
@@ -213,7 +214,6 @@ func (sip *Sip) setFromConfig(config *sipConfig) error {
 	sip.transactionTimeout = config.TransactionTimeout
 	return nil
 }
-
 func newTransaction(ts time.Time, tuple SipTuple, cmd common.CmdlineTuple) *SipTransaction {
 	trans := &SipTransaction{
 		Transport: tuple.Transport,
@@ -232,48 +232,6 @@ func newTransaction(ts time.Time, tuple SipTuple, cmd common.CmdlineTuple) *SipT
 	}
 	return trans
 }
-
-/*func (sip *Sip) newTransaction(requ, resp *SipMessage) common.MapStr {
-	error := common.OK_STATUS
-	src := &common.Endpoint{
-		Ip:   requ.tuple.Src_ip.String(),
-		Port: requ.tuple.Src_port,
-		Proc: string(requ.cmd.Src),
-	}
-	dst := &common.Endpoint{
-		Ip:   requ.tuple.Dst_ip.String(),
-		Port: requ.tuple.Dst_port,
-		Proc: string(requ.cmd.Dst),
-	}
-	// resp_time in milliseconds
-	responseTime := int32(resp.Ts.Sub(requ.Ts).Nanoseconds() / 1e6)
-
-	event := common.MapStr{
-		"@timestamp":   common.Time(requ.Ts),
-		"type":         "sip",
-		"status":       error,
-		"responsetime": responseTime,
-		"bytes_in":     uint64(requ.Size),
-		"bytes_out":    uint64(resp.Size),
-		"src":          src,
-		"dst":          dst,
-	}
-	if sip.Send_request {
-		event["request"] = requ.Data
-	}
-	if sip.Send_response {
-		event["response"] = resp.Data
-	}
-
-	return event
-}
-
-func (sip *SIP) publishTransaction(event common.MapStr) {
-	if sip.results == nil {
-		return
-	}
-	sip.results.PublishTransaction(event)
-}*/
 
 // deleteTransaction deletes an entry from the transaction map and returns
 // the deleted element. If the key does not exist then nil is returned.
@@ -300,7 +258,7 @@ func (sip *Sip) receivedSipRequest(tuple *SipTuple, msg *SipMessage) {
 		sip.publishTransaction(trans)
 		sip.deleteTransaction(trans.tuple.Hashable())
 	}
-	//trans = newTransaction(msg.Ts, *tuple, *msg.CmdlineTuple)
+	trans = newTransaction(msg.Ts, *tuple, *msg.CmdlineTuple)
 	sip.transactions.Put(tuple.Hashable(), trans)
 	trans.Request = msg
 }
@@ -309,10 +267,10 @@ func (sip *Sip) receivedSipResponse(tuple *SipTuple, msg *SipMessage) {
 	debugf("Processing response. %s", tuple.String())
 
 	trans := sip.getTransaction(tuple.RevHashable())
-	/*if trans == nil {
-		trans = newTransaction(msg * SipMessage)
-		//trans.Notes = append(trans.Notes)
-	}*/
+	if trans == nil {
+		trans = newTransaction(msg.Ts, tuple.Reverse(), common.CmdlineTuple{
+			Src: msg.CmdlineTuple.Dst, Dst: msg.CmdlineTuple.Src})
+	}
 	trans.Response = msg
 
 	sip.publishTransaction(trans)
@@ -348,26 +306,26 @@ func (sip *Sip) publishTransaction(t *SipTransaction) {
 		if sip.Send_response {
 			//event["response"] = string(t.Response.Data)
 			event["response"] = "response"
-		} else if t.Request != nil {
-			event["bytes_in"] = t.Request.Length
-
-			if sip.Send_request {
-				//event["request"] = string(t.Request.Data)
-				event["request"] = "request"
-			}
-		} else if t.Response != nil {
-			event["bytes_out"] = t.Response.Length
-
-			if sip.Send_response {
-				//event["response"] = string(t.Response.Data)
-				event["response"] = "response"
-
-			}
 		}
+	} else if t.Request != nil {
+		event["bytes_in"] = t.Request.Length
 
-		sip.results.PublishTransaction(event)
+		if sip.Send_request {
+			//event["request"] = string(t.Request.Data)
+			event["request"] = "request"
+		}
+	} else if t.Response != nil {
+		event["bytes_out"] = t.Response.Length
 
+		if sip.Send_response {
+			//event["response"] = string(t.Response.Data)
+			event["response"] = "response"
+
+		}
 	}
+
+	sip.results.PublishTransaction(event)
+
 }
 func (sip *Sip) expireTransaction(t *SipTransaction) {
 	debugf("%s", t.tuple.String())

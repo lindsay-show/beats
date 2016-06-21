@@ -14,7 +14,6 @@ func (sip *Sip) ParseUdp(pkt *protos.Packet) {
 
 	debugf("Parsing packet addressed with %s of length %d.",
 		pkt.Tuple.String(), packetSize)
-
 	sipPkt, err := decodeSipData(TransportUdp, pkt.Payload)
 	if err != nil {
 		// This means that malformed requests or responses are being sent or
