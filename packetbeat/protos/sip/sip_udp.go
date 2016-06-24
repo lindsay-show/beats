@@ -15,6 +15,8 @@ func (sip *Sip) ParseUdp(pkt *protos.Packet) {
 	debugf("Parsing packet addressed with %s of length %d.",
 		pkt.Tuple.String(), packetSize)
 	sipPkt, err := decodeSipData(TransportUdp, pkt.Payload)
+	reqsipPkt, err := decodeReqSipData(TransportUdp, pkt.Payload)
+	respsipPkt, err := decodeRespSipData(TransportUdp, pkt.Payload)
 	if err != nil {
 		// This means that malformed requests or responses are being sent or
 		// that someone is attempting to the SIP port for non-SIP traffic. Both
@@ -22,18 +24,30 @@ func (sip *Sip) ParseUdp(pkt *protos.Packet) {
 		debugf("%s", err.Error())
 		return
 	}
-	sipTuple := SipTupleFromIpPort(&pkt.Tuple, TransportUdp, sipPkt.Id)
-	sipMsg := &SipMessage{
-		Ts:           pkt.Ts,
-		Tuple:        pkt.Tuple,
-		CmdlineTuple: procs.ProcWatcher.FindProcessesTuple(&pkt.Tuple),
-		Data:         sipPkt,
-		Length:       packetSize,
-	}
 
-	if sipMsg.Data.Response {
-		sip.receivedSipResponse(&sipTuple, sipMsg)
-	} else /* Request */ {
-		sip.receivedSipRequest(&sipTuple, sipMsg)
+	sipTuple := SipTupleFromIpPort(&pkt.Tuple, TransportUdp, sipPkt.Id)
+	reqsipMsg := &ReqSipMessage{
+		SipMessage: SipMessage{
+			Ts:           pkt.Ts,
+			Tuple:        pkt.Tuple,
+			CmdlineTuple: procs.ProcWatcher.FindProcessesTuple(&pkt.Tuple),
+			Length:       packetSize,
+			Data:         sipPkt,
+		},
+		Req: reqsipPkt,
+	}
+	respsipMsg := &RespSipMessage{
+		SipMessage: SipMessage{
+			Ts:           pkt.Ts,
+			Tuple:        pkt.Tuple,
+			CmdlineTuple: procs.ProcWatcher.FindProcessesTuple(&pkt.Tuple),
+			Length:       packetSize,
+		},
+		Resp: respsipPkt,
+	}
+	if sipPkt.Response {
+		sip.receivedSipResponse(&sipTuple, respsipMsg)
+	} else /* Request*/ {
+		sip.receivedSipRequest(&sipTuple, reqsipMsg)
 	}
 }

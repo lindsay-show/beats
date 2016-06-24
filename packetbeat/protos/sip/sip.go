@@ -46,8 +46,21 @@ type SipMessage struct {
 	Ts           time.Time          // Time when the message was received.
 	Tuple        common.IpPortTuple // Source and destination addresses of packet.
 	CmdlineTuple *common.CmdlineTuple
-	Length       int      // Length of the SIP message in bytes (without DecodeOffset).
-	Data         *message /// Parsed SIP packet data.
+	Length       int // Length of the SIP message in bytes (without DecodeOffset).
+	//Data         *message /// Parsed SIP packet data
+
+}
+
+// ReqSipMessage contains a single SIP message.
+type ReqSipMessage struct {
+	SipMessage
+	Req *request
+}
+
+// ReqSipMessage contains a single SIP message.
+type RespSipMessage struct {
+	SipMessage
+	Resp *response
 }
 
 // SipTuple contains source IP/port, destination IP/port, transport protocol,
@@ -163,8 +176,10 @@ type SipTransaction struct {
 	Transport    Transport
 	Notes        []string
 
-	Request  *SipMessage
-	Response *SipMessage
+	//Request *SipMessage
+	//Response *SipMessage
+	Request  *ReqSipMessage
+	Response *RespSipMessage
 }
 
 func init() {
@@ -214,6 +229,7 @@ func (sip *Sip) setFromConfig(config *sipConfig) error {
 	sip.transactionTimeout = config.TransactionTimeout
 	return nil
 }
+
 func newTransaction(ts time.Time, tuple SipTuple, cmd common.CmdlineTuple) *SipTransaction {
 	trans := &SipTransaction{
 		Transport: tuple.Transport,
@@ -250,7 +266,7 @@ func (sip *Sip) GetPorts() []int {
 func (sip *Sip) ConnectionTimeout() time.Duration {
 	return sip.transactionTimeout
 }
-func (sip *Sip) receivedSipRequest(tuple *SipTuple, msg *SipMessage) {
+func (sip *Sip) receivedSipRequest(tuple *SipTuple, msg *ReqSipMessage) {
 	debugf("Processing request. %s", tuple.String())
 
 	trans := sip.deleteTransaction(tuple.Hashable())
@@ -260,10 +276,11 @@ func (sip *Sip) receivedSipRequest(tuple *SipTuple, msg *SipMessage) {
 	}
 	trans = newTransaction(msg.Ts, *tuple, *msg.CmdlineTuple)
 	sip.transactions.Put(tuple.Hashable(), trans)
+
 	trans.Request = msg
 }
 
-func (sip *Sip) receivedSipResponse(tuple *SipTuple, msg *SipMessage) {
+func (sip *Sip) receivedSipResponse(tuple *SipTuple, msg *RespSipMessage) {
 	debugf("Processing response. %s", tuple.String())
 
 	trans := sip.getTransaction(tuple.RevHashable())
@@ -272,7 +289,6 @@ func (sip *Sip) receivedSipResponse(tuple *SipTuple, msg *SipMessage) {
 			Src: msg.CmdlineTuple.Dst, Dst: msg.CmdlineTuple.Src})
 	}
 	trans.Response = msg
-
 	sip.publishTransaction(trans)
 	sip.deleteTransaction(trans.tuple.Hashable())
 }
@@ -283,50 +299,47 @@ func (sip *Sip) publishTransaction(t *SipTransaction) {
 	}
 
 	debugf("Publishing transaction. %s", t.tuple.String())
-
 	event := common.MapStr{}
 	event["@timestamp"] = common.Time(t.ts)
 	event["type"] = "sip"
 	event["transport"] = t.Transport.String()
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
-	event["status"] = common.ERROR_STATUS
-	sipEvent := common.MapStr{}
-	event["sip"] = sipEvent
-
 	if t.Request != nil && t.Response != nil {
 		event["bytes_in"] = t.Request.Length
 		event["bytes_out"] = t.Response.Length
 		event["responsetime"] = int32(t.Response.Ts.Sub(t.ts).Nanoseconds() / 1e6)
-
+		event["method"] = t.Request.Req.GetMethod()
+		event["request-url"] = t.Request.Req.GetRequestURI()
+		event["status_code"] = t.Response.Resp.GetStatusCode()
+		event["reason_phrase"] = t.Response.Resp.GetReasonPhrase()
 		if sip.Send_request {
-			//event["request"] = string(t.Request.Data)
-			event["request"] = "request"
+			event["request"] = "t.Request.Req"
+
 		}
 		if sip.Send_response {
-			//event["response"] = string(t.Response.Data)
-			event["response"] = "response"
+			event["response"] = "t.Response.Resp"
 		}
 	} else if t.Request != nil {
 		event["bytes_in"] = t.Request.Length
-
+		event["method"] = t.Request.Req.GetMethod()
+		event["request_url"] = t.Request.Req.GetRequestURI()
 		if sip.Send_request {
-			//event["request"] = string(t.Request.Data)
-			event["request"] = "request"
+			event["request"] = "t.Request.Req"
 		}
 	} else if t.Response != nil {
 		event["bytes_out"] = t.Response.Length
-
+		event["status_code"] = t.Response.Resp.GetStatusCode()
+		event["reason_phrase"] = t.Response.Resp.GetReasonPhrase()
 		if sip.Send_response {
-			//event["response"] = string(t.Response.Data)
-			event["response"] = "response"
-
+			event["response"] = "t.Response.Resp"
 		}
 	}
 
 	sip.results.PublishTransaction(event)
 
 }
+
 func (sip *Sip) expireTransaction(t *SipTransaction) {
 	debugf("%s", t.tuple.String())
 	sip.publishTransaction(t)
@@ -344,6 +357,30 @@ func decodeSipData(transport Transport, rawData []byte) (sip *message, err error
 		}
 	}()
 	msg := &message{}
+	return msg, nil
+
+}
+func decodeReqSipData(transport Transport, rawData []byte) (sip *request, err error) {
+
+	// Recover from any panics that occur while parsing a packet.
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("panic: %v", r)
+		}
+	}()
+	msg := &request{}
+	return msg, nil
+
+}
+func decodeRespSipData(transport Transport, rawData []byte) (sip *response, err error) {
+
+	// Recover from any panics that occur while parsing a packet.
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("panic: %v", r)
+		}
+	}()
+	msg := &response{}
 	return msg, nil
 
 }

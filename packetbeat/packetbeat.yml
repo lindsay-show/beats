@@ -39,7 +39,8 @@ packetbeat.protocols.dns:
   # Configure the ports where to listen for DNS traffic. You can disable
   # the DNS protocol by commenting out the list of ports.
   ports: [53]
-
+  send_request: true
+  send_response: true
   # include_authorities controls whether or not the dns.authorities field
   # (authority resource records) is added to messages.
   include_authorities: true
