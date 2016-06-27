@@ -5,13 +5,12 @@ package sip
 
 import (
 	"fmt"
-	"net"
-	"time"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/publish"
+	"net"
+	"time"
 )
 
 var (
@@ -48,7 +47,6 @@ type SipMessage struct {
 	CmdlineTuple *common.CmdlineTuple
 	Length       int // Length of the SIP message in bytes (without DecodeOffset).
 	//Data         *message /// Parsed SIP packet data
-
 }
 
 // ReqSipMessage contains a single SIP message.
@@ -176,7 +174,7 @@ type SipTransaction struct {
 	Transport    Transport
 	Notes        []string
 
-	//Request *SipMessage
+	//Request  *SipMessage
 	//Response *SipMessage
 	Request  *ReqSipMessage
 	Response *RespSipMessage
@@ -297,45 +295,63 @@ func (sip *Sip) publishTransaction(t *SipTransaction) {
 	if sip.results == nil {
 		return
 	}
-
+	//resopnseTime := int32(t.Response.Ts.Sub(t.ts).Nanoseconds() / 1e6)
 	debugf("Publishing transaction. %s", t.tuple.String())
-	event := common.MapStr{}
-	event["@timestamp"] = common.Time(t.ts)
-	event["type"] = "sip"
-	event["transport"] = t.Transport.String()
-	event["src"] = &t.Src
-	event["dst"] = &t.Dst
+	event := common.MapStr{
+		"@timestamp": common.Time(t.ts),
+		"type":       "sip",
+		"transport":  t.Transport.String(),
+		"src":        &t.Src,
+		"dst":        &t.Dst,
+	}
 	if t.Request != nil && t.Response != nil {
+		debugf("version: %s", t.Response.Resp.message.sipVersion)
+		debugf("statuscode: %d", t.Response.Resp.statusCode)
+		debugf("contenlength: %s", t.Response.Resp.contentLength)
+		debugf("method: %s", t.Request.Req.method)
+		debugf("requestUIR: %s", t.Request.Req.requestURI)
+		debugf("version: %s", t.Request.Req.GetSIPVersion())
+
+		event["responsetime"] = int32(t.Response.Ts.Sub(t.ts).Nanoseconds() / 1e6)
+		event["method"] = t.Request.Req.method
+		event["requestURI"] = t.Request.Req.requestURI
+		event["version"] = t.Request.Req.message.sipVersion
+
+		event["reasonphrase"] = t.Response.Resp.reasonPhrase
+		event["statuscode"] = t.Response.Resp.statusCode
+		event["content_length"] = t.Response.Resp.contentLength
+
 		event["bytes_in"] = t.Request.Length
 		event["bytes_out"] = t.Response.Length
-		event["responsetime"] = int32(t.Response.Ts.Sub(t.ts).Nanoseconds() / 1e6)
-		event["method"] = t.Request.Req.GetMethod()
-		event["request-url"] = t.Request.Req.GetRequestURI()
-		event["status_code"] = t.Response.Resp.GetStatusCode()
-		event["reason_phrase"] = t.Response.Resp.GetReasonPhrase()
 		if sip.Send_request {
-			event["request"] = "t.Request.Req"
-
+			event["request"] = "request"
 		}
 		if sip.Send_response {
-			event["response"] = "t.Response.Resp"
+			event["response"] = "response"
 		}
 	} else if t.Request != nil {
+		debugf("method: %s", t.Request.Req.method)
+		debugf("requestUIR: %s", t.Request.Req.requestURI)
+		debugf("version: %s", t.Request.Req.GetSIPVersion())
 		event["bytes_in"] = t.Request.Length
-		event["method"] = t.Request.Req.GetMethod()
-		event["request_url"] = t.Request.Req.GetRequestURI()
+		event["method"] = t.Request.Req.method
+		event["requestURI"] = t.Request.Req.requestURI
+		event["version"] = t.Request.Req.message.sipVersion
 		if sip.Send_request {
-			event["request"] = "t.Request.Req"
+			event["request"] = "request"
 		}
 	} else if t.Response != nil {
-		event["bytes_out"] = t.Response.Length
-		event["status_code"] = t.Response.Resp.GetStatusCode()
-		event["reason_phrase"] = t.Response.Resp.GetReasonPhrase()
+		debugf("version: %s", t.Response.Resp.message.sipVersion)
+		debugf("statuscode: %d", t.Response.Resp.statusCode)
+		debugf("contenlength: %s", t.Response.Resp.contentLength)
+		event["reasonphrase"] = t.Response.Resp.reasonPhrase
+		event["statuscode"] = t.Response.Resp.statusCode
+		event["content_length"] = t.Response.Resp.contentLength
+		event["version"] = t.Response.Resp.message.sipVersion
 		if sip.Send_response {
-			event["response"] = "t.Response.Resp"
+			event["response"] = "response"
 		}
 	}
-
 	sip.results.PublishTransaction(event)
 
 }
@@ -368,7 +384,14 @@ func decodeReqSipData(transport Transport, rawData []byte) (sip *request, err er
 			err = fmt.Errorf("panic: %v", r)
 		}
 	}()
-	msg := &request{}
+	msg := &request{
+		message: message{
+			sipVersion: "SIP/2.0",
+			header:     make(Header),
+			body:       body,
+		},
+		method:     method,
+		requestURI: requestURI}
 	return msg, nil
 
 }
@@ -380,7 +403,15 @@ func decodeRespSipData(transport Transport, rawData []byte) (sip *response, err 
 			err = fmt.Errorf("panic: %v", r)
 		}
 	}()
-	msg := &response{}
+	msg := &response{
+		message: message{
+			sipVersion: "SIP/2.0",
+			header:     make(Header),
+			body:       body,
+		},
+		statusCode:   statusCode,
+		reasonPhrase: reasonPhrase,
+	}
 	return msg, nil
 
 }

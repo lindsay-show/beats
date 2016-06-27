@@ -14,7 +14,7 @@ func (sip *Sip) ParseUdp(pkt *protos.Packet) {
 
 	debugf("Parsing packet addressed with %s of length %d.",
 		pkt.Tuple.String(), packetSize)
-	sipPkt, err := decodeSipData(TransportUdp, pkt.Payload)
+	sipPkt, err := decodeReqSipData(TransportUdp, pkt.Payload)
 	reqsipPkt, err := decodeReqSipData(TransportUdp, pkt.Payload)
 	respsipPkt, err := decodeRespSipData(TransportUdp, pkt.Payload)
 	if err != nil {
@@ -32,7 +32,6 @@ func (sip *Sip) ParseUdp(pkt *protos.Packet) {
 			Tuple:        pkt.Tuple,
 			CmdlineTuple: procs.ProcWatcher.FindProcessesTuple(&pkt.Tuple),
 			Length:       packetSize,
-			Data:         sipPkt,
 		},
 		Req: reqsipPkt,
 	}
@@ -45,7 +44,7 @@ func (sip *Sip) ParseUdp(pkt *protos.Packet) {
 		},
 		Resp: respsipPkt,
 	}
-	if sipPkt.Response {
+	if reqsipMsg.Req.Response {
 		sip.receivedSipResponse(&sipTuple, respsipMsg)
 	} else /* Request*/ {
 		sip.receivedSipRequest(&sipTuple, reqsipMsg)
