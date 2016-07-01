@@ -1,8 +1,12 @@
 package sip
 
 import (
+	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
+	"github.com/elastic/beats/packetbeat/protos/sip/header"
+	"github.com/elastic/beats/packetbeat/protos/sip/parser"
 	"io"
 	"strings"
 )
@@ -89,4 +93,71 @@ func (this *request) StartLineWrite(w io.Writer) (err error) {
 		return err
 	}
 	return nil
+}
+
+// ReadMessage reads and parses an incoming message from b.
+func ReadRequestMessage(b *bufio.Reader) (msg Request, err error) {
+	tp := newTextprotoReader(b)
+
+	// First line: INVITE sip:bob@biloxi.com SIP/2.0 or SIP/2.0 180 Ringing
+	var s string
+	if s, err = tp.ReadLine(); err != nil {
+		return nil, err
+	}
+	defer func() {
+		putTextprotoReader(tp)
+		if err == io.EOF {
+			err = io.ErrUnexpectedEOF
+		}
+	}()
+
+	s1 := strings.Index(s, " ")
+	s2 := strings.Index(s[s1+1:], " ")
+	if s1 < 0 || s2 < 0 {
+		return nil, fmt.Errorf("malformed SIP request %s", s)
+	}
+	s2 += s1 + 1
+
+	if strings.TrimSpace(s[:s1]) == "SIP/2.0" {
+		return
+	} else {
+		method, requestURI, sipVersion := s[:s1], s[s1+1:s2], s[s2+1:]
+		if _, _, ok := ParseSIPVersion(sipVersion); !ok {
+			return nil, fmt.Errorf("malformed SIP version", sipVersion)
+		}
+		msg = NewRequest(method, requestURI, nil)
+	}
+
+	////////////////////////////////////////////////////////////////////////////
+	// Subsequent lines: Key: value.
+	mimeHeader, err := tp.ReadMIMEHeader()
+	if err != nil {
+		return nil, err
+	}
+	msg.SetHeader(Header(mimeHeader))
+
+	////////////////////////////////////////////////////////////////////////////
+
+	contentLens := msg.GetHeader()["Content-Length"]
+	if len(contentLens) > 1 { // harden against SIP request smuggling. See RFC 7230.
+		return nil, errors.New("http: message cannot contain multiple Content-Length headers")
+	} else if len(contentLens) == 0 {
+		msg.SetContentLength(0)
+	} else {
+		if cl, err := parser.NewContentLengthParser("Content-Length: " + contentLens[0]).Parse(); err != nil {
+			return nil, err
+		} else {
+			msg.SetContentLength(int64(cl.(header.ContentLengthHeader).GetContentLength()))
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////
+
+	if msg.GetContentLength() > 0 {
+		msg.SetBody(io.LimitReader(b, int64(msg.GetContentLength())))
+	} else {
+		msg.SetBody(nil)
+	}
+
+	return msg, nil
 }

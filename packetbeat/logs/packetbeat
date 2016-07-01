@@ -1,1 +1,25 @@
-2016-06-24T16:26:00+08:00 ERR Failed to perform any bulk index operations: Post http://localhost:9200/_bulk: dial tcp [::1]:9200: getsockopt: connection refused
+2016-07-01T14:52:24+08:00 ERR Sip ParseUdp. Recovering, but please report this: runtime error: invalid memory address or nil pointer dereference.
+2016-07-01T14:52:24+08:00 ERR Stacktrace: goroutine 42 [running]:
+runtime/debug.Stack(0x0, 0x0, 0x0)
+	/usr/local/go/src/runtime/debug/stack.go:24 +0x80
+github.com/elastic/beats/libbeat/logp.Recover(0x48f8470, 0xc)
+	/usr/local/go/src/github.com/elastic/beats/libbeat/logp/log.go:114 +0x166
+panic(0x47cc480, 0xc82000a130)
+	/usr/local/go/src/runtime/panic.go:443 +0x4e9
+github.com/elastic/beats/packetbeat/protos/sip.(*Sip).ParseUdp(0xc82006df00, 0xc8200e8900)
+	/Users/xm/workgo/src/github.com/elastic/beats/packetbeat/protos/sip/sip_udp.go:38 +0xb6a
+github.com/elastic/beats/packetbeat/protos/udp.(*Udp).Process(0xc8211e57e0, 0xc82123cdc0, 0xc8200e8900)
+	/usr/local/go/src/github.com/elastic/beats/packetbeat/protos/udp/udp.go:59 +0x429
+github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).onUDP(0xc8200ba400, 0xc8200e8900)
+	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:295 +0x119
+github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).process(0xc8200ba400, 0xc8200e8900, 0x2d, 0x4, 0x0, 0x0)
+	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:253 +0x5fd
+github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).OnPacket(0xc8200ba400, 0xc82123f0aa, 0x4, 0x4, 0xc82123f050)
+	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:164 +0x81f
+github.com/elastic/beats/packetbeat/sniffer.(*SnifferSetup).Run(0xc821220c00, 0x0, 0x0)
+	/usr/local/go/src/github.com/elastic/beats/packetbeat/sniffer/sniffer.go:350 +0xba0
+github.com/elastic/beats/packetbeat/beater.(*Packetbeat).Run.func1(0xc8212407b0, 0xc82009ef00, 0xc821221080)
+	/usr/local/go/src/github.com/elastic/beats/packetbeat/beater/packetbeat.go:247 +0x6d
+created by github.com/elastic/beats/packetbeat/beater.(*Packetbeat).Run
+	/usr/local/go/src/github.com/elastic/beats/packetbeat/beater/packetbeat.go:251 +0x16b
+

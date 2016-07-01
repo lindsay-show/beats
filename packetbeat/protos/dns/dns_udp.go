@@ -1,8 +1,8 @@
 package dns
 
 import (
+	"fmt"
 	"github.com/elastic/beats/libbeat/logp"
-
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 )
@@ -18,6 +18,7 @@ func (dns *Dns) ParseUdp(pkt *protos.Packet) {
 		pkt.Tuple.String(), packetSize)
 
 	dnsPkt, err := decodeDnsData(TransportUdp, pkt.Payload)
+	debugf("dns test %v", dnsPkt)
 	if err != nil {
 		// This means that malformed requests or responses are being sent or
 		// that someone is attempting to the DNS port for non-DNS traffic. Both
@@ -34,7 +35,6 @@ func (dns *Dns) ParseUdp(pkt *protos.Packet) {
 		Data:         dnsPkt,
 		Length:       packetSize,
 	}
-
 	if dnsMsg.Data.Response {
 		dns.receivedDnsResponse(&dnsTuple, dnsMsg)
 	} else /* Query */ {

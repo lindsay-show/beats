@@ -1,9 +1,11 @@
 package sip
 
 import (
+	"bufio"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
+	"strings"
 )
 
 const MaxSipPacketSize = 65535 //(bytes)
@@ -14,9 +16,7 @@ func (sip *Sip) ParseUdp(pkt *protos.Packet) {
 
 	debugf("Parsing packet addressed with %s of length %d.",
 		pkt.Tuple.String(), packetSize)
-	sipPkt, err := decodeReqSipData(TransportUdp, pkt.Payload)
-	reqsipPkt, err := decodeReqSipData(TransportUdp, pkt.Payload)
-	respsipPkt, err := decodeRespSipData(TransportUdp, pkt.Payload)
+	sipPkt, err := decodeSipData(TransportUdp, pkt.Payload)
 	if err != nil {
 		// This means that malformed requests or responses are being sent or
 		// that someone is attempting to the SIP port for non-SIP traffic. Both
@@ -24,29 +24,39 @@ func (sip *Sip) ParseUdp(pkt *protos.Packet) {
 		debugf("%s", err.Error())
 		return
 	}
-
 	sipTuple := SipTupleFromIpPort(&pkt.Tuple, TransportUdp, sipPkt.Id)
-	reqsipMsg := &ReqSipMessage{
-		SipMessage: SipMessage{
-			Ts:           pkt.Ts,
-			Tuple:        pkt.Tuple,
-			CmdlineTuple: procs.ProcWatcher.FindProcessesTuple(&pkt.Tuple),
-			Length:       packetSize,
-		},
-		Req: reqsipPkt,
-	}
-	respsipMsg := &RespSipMessage{
-		SipMessage: SipMessage{
-			Ts:           pkt.Ts,
-			Tuple:        pkt.Tuple,
-			CmdlineTuple: procs.ProcWatcher.FindProcessesTuple(&pkt.Tuple),
-			Length:       packetSize,
-		},
-		Resp: respsipPkt,
-	}
-	if reqsipMsg.Req.Response {
+	sipload := strings.NewReader(string(pkt.Payload))
+	buf := bufio.NewReader(sipload)
+	if sipPkt.Response {
+		msg, _ := ReadResponseMessage(buf)
+		respsipPkt := NewResponse(msg.GetStatusCode(), msg.GetReasonPhrase(), nil)
+
+		respsipMsg := &RespSipMessage{
+			SipMessage: SipMessage{
+				Ts:           pkt.Ts,
+				Tuple:        pkt.Tuple,
+				CmdlineTuple: procs.ProcWatcher.FindProcessesTuple(&pkt.Tuple),
+				Length:       packetSize,
+			},
+			Resp: respsipPkt,
+		}
 		sip.receivedSipResponse(&sipTuple, respsipMsg)
-	} else /* Request*/ {
+
+	} else {
+		msg, _ := ReadRequestMessage(buf)
+		debugf("request: %v", msg.GetHeader())
+		reqsipPkt := NewRequest(msg.GetMethod(), msg.GetRequestURI(), nil)
+		reqsipMsg := &ReqSipMessage{
+			SipMessage: SipMessage{
+				Ts:           pkt.Ts,
+				Tuple:        pkt.Tuple,
+				CmdlineTuple: procs.ProcWatcher.FindProcessesTuple(&pkt.Tuple),
+				Length:       packetSize,
+			},
+			Req: reqsipPkt,
+		}
+
 		sip.receivedSipRequest(&sipTuple, reqsipMsg)
 	}
+
 }

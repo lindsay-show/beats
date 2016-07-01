@@ -767,10 +767,10 @@ func dnsToString(dns *mkdns.Msg) string {
 // and is concurrency-safe.
 // We do not handle Unpack ErrTruncated for now. See https://github.com/miekg/dns/pull/281
 func decodeDnsData(transport Transport, rawData []byte) (dns *mkdns.Msg, err error) {
-	var offset int
+	/*var offset int
 	if transport == TransportTcp {
 		offset = DecodeOffset
-	}
+	}*/
 
 	// Recover from any panics that occur while parsing a packet.
 	defer func() {
@@ -780,7 +780,7 @@ func decodeDnsData(transport Transport, rawData []byte) (dns *mkdns.Msg, err err
 	}()
 
 	msg := &mkdns.Msg{}
-	err = msg.Unpack(rawData[offset:])
+	/*err = msg.Unpack(rawData[offset:])
 
 	// Message should be more than 12 bytes.
 	// The 12 bytes value corresponds to a message header length.
@@ -788,6 +788,6 @@ func decodeDnsData(transport Transport, rawData []byte) (dns *mkdns.Msg, err err
 	// TODO: can a better solution be found?
 	if msg.Len() <= 12 || err != nil {
 		return nil, NonDnsMsg
-	}
+	}*/
 	return msg, nil
 }

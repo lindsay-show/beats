@@ -48,10 +48,8 @@ type message struct {
 	callId        *header.CallID
 	maxForwards   *header.MaxForwards
 	contentLength *header.ContentLength
-
-	//contentLength int64
-	body     io.Reader
-	Response bool
+	body          io.Reader
+	Response      bool
 }
 
 func (this *message) GetSIPVersion() string {
