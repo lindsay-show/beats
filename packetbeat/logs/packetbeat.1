@@ -1,199 +1,24 @@
-2016-07-01T14:31:44+08:00 ERR Sip ParseUdp. Recovering, but please report this: runtime error: invalid memory address or nil pointer dereference.
-2016-07-01T14:31:44+08:00 ERR Stacktrace: goroutine 59 [running]:
+2016-07-05T11:29:47+08:00 ERR Sip ParseUdp. Recovering, but please report this: runtime error: invalid memory address or nil pointer dereference.
+2016-07-05T11:29:47+08:00 ERR Stacktrace: goroutine 34 [running]:
 runtime/debug.Stack(0x0, 0x0, 0x0)
 	/usr/local/go/src/runtime/debug/stack.go:24 +0x80
-github.com/elastic/beats/libbeat/logp.Recover(0x48f8470, 0xc)
+github.com/elastic/beats/libbeat/logp.Recover(0x48f5340, 0xc)
 	/usr/local/go/src/github.com/elastic/beats/libbeat/logp/log.go:114 +0x166
-panic(0x47cc480, 0xc82000a130)
+panic(0x47c9d00, 0xc82000a130)
 	/usr/local/go/src/runtime/panic.go:443 +0x4e9
-github.com/elastic/beats/packetbeat/protos/sip.(*Sip).ParseUdp(0xc8201457c0, 0xc8215c6780)
-	/Users/xm/workgo/src/github.com/elastic/beats/packetbeat/protos/sip/sip_udp.go:38 +0xb6a
-github.com/elastic/beats/packetbeat/protos/udp.(*Udp).Process(0xc8211fd7c0, 0xc82124ecc0, 0xc8215c6780)
+github.com/elastic/beats/packetbeat/protos/sip.(*Sip).ParseUdp(0xc82123a080, 0xc8212906c0)
+	/Users/xm/workgo/src/github.com/elastic/beats/packetbeat/protos/sip/sip_udp.go:47 +0x7e8
+github.com/elastic/beats/packetbeat/protos/udp.(*Udp).Process(0xc8212422c0, 0xc82123af00, 0xc8212906c0)
 	/usr/local/go/src/github.com/elastic/beats/packetbeat/protos/udp/udp.go:59 +0x429
-github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).onUDP(0xc8200ba400, 0xc8215c6780)
+github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).onUDP(0xc82009c400, 0xc8212906c0)
 	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:295 +0x119
-github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).process(0xc8200ba400, 0xc8215c6780, 0x2d, 0x1e5, 0x0, 0x0)
+github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).process(0xc82009c400, 0xc8212906c0, 0x2d, 0x4, 0x0, 0x0)
 	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:253 +0x5fd
-github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).OnPacket(0xc8200ba400, 0xc8213ab22a, 0x1e5, 0x1e5, 0xc8215bec90)
+github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).OnPacket(0xc82009c400, 0xc8211dc65a, 0x4, 0x4, 0xc8211dc600)
 	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:164 +0x81f
-github.com/elastic/beats/packetbeat/sniffer.(*SnifferSetup).Run(0xc821246ae0, 0x0, 0x0)
+github.com/elastic/beats/packetbeat/sniffer.(*SnifferSetup).Run(0xc82120cea0, 0x0, 0x0)
 	/usr/local/go/src/github.com/elastic/beats/packetbeat/sniffer/sniffer.go:350 +0xba0
-github.com/elastic/beats/packetbeat/beater.(*Packetbeat).Run.func1(0xc821248e60, 0xc82009ef00, 0xc821246f60)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/beater/packetbeat.go:247 +0x6d
-created by github.com/elastic/beats/packetbeat/beater.(*Packetbeat).Run
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/beater/packetbeat.go:251 +0x16b
-
-2016-07-01T14:31:44+08:00 ERR Sip ParseUdp. Recovering, but please report this: runtime error: invalid memory address or nil pointer dereference.
-2016-07-01T14:31:44+08:00 ERR Stacktrace: goroutine 59 [running]:
-runtime/debug.Stack(0x0, 0x0, 0x0)
-	/usr/local/go/src/runtime/debug/stack.go:24 +0x80
-github.com/elastic/beats/libbeat/logp.Recover(0x48f8470, 0xc)
-	/usr/local/go/src/github.com/elastic/beats/libbeat/logp/log.go:114 +0x166
-panic(0x47cc480, 0xc82000a130)
-	/usr/local/go/src/runtime/panic.go:443 +0x4e9
-github.com/elastic/beats/packetbeat/protos/sip.(*Sip).ParseUdp(0xc8201457c0, 0xc8215c6900)
-	/Users/xm/workgo/src/github.com/elastic/beats/packetbeat/protos/sip/sip_udp.go:38 +0xb6a
-github.com/elastic/beats/packetbeat/protos/udp.(*Udp).Process(0xc8211fd7c0, 0xc82124ecc0, 0xc8215c6900)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/protos/udp/udp.go:59 +0x429
-github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).onUDP(0xc8200ba400, 0xc8215c6900)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:295 +0x119
-github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).process(0xc8200ba400, 0xc8215c6900, 0x2d, 0x23c, 0x0, 0x0)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:253 +0x5fd
-github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).OnPacket(0xc8200ba400, 0xc8213af42a, 0x23c, 0x23c, 0xc82164ae70)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:164 +0x81f
-github.com/elastic/beats/packetbeat/sniffer.(*SnifferSetup).Run(0xc821246ae0, 0x0, 0x0)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/sniffer/sniffer.go:350 +0xba0
-github.com/elastic/beats/packetbeat/beater.(*Packetbeat).Run.func1(0xc821248e60, 0xc82009ef00, 0xc821246f60)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/beater/packetbeat.go:247 +0x6d
-created by github.com/elastic/beats/packetbeat/beater.(*Packetbeat).Run
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/beater/packetbeat.go:251 +0x16b
-
-2016-07-01T14:31:45+08:00 ERR Sip ParseUdp. Recovering, but please report this: runtime error: invalid memory address or nil pointer dereference.
-2016-07-01T14:31:45+08:00 ERR Stacktrace: goroutine 59 [running]:
-runtime/debug.Stack(0x0, 0x0, 0x0)
-	/usr/local/go/src/runtime/debug/stack.go:24 +0x80
-github.com/elastic/beats/libbeat/logp.Recover(0x48f8470, 0xc)
-	/usr/local/go/src/github.com/elastic/beats/libbeat/logp/log.go:114 +0x166
-panic(0x47cc480, 0xc82000a130)
-	/usr/local/go/src/runtime/panic.go:443 +0x4e9
-github.com/elastic/beats/packetbeat/protos/sip.(*Sip).ParseUdp(0xc8201457c0, 0xc8215c6a80)
-	/Users/xm/workgo/src/github.com/elastic/beats/packetbeat/protos/sip/sip_udp.go:38 +0xb6a
-github.com/elastic/beats/packetbeat/protos/udp.(*Udp).Process(0xc8211fd7c0, 0xc82124ecc0, 0xc8215c6a80)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/protos/udp/udp.go:59 +0x429
-github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).onUDP(0xc8200ba400, 0xc8215c6a80)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:295 +0x119
-github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).process(0xc8200ba400, 0xc8215c6a80, 0x2d, 0x353, 0x0, 0x0)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:253 +0x5fd
-github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).OnPacket(0xc8200ba400, 0xc8215c23aa, 0x353, 0x353, 0xc82164af90)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:164 +0x81f
-github.com/elastic/beats/packetbeat/sniffer.(*SnifferSetup).Run(0xc821246ae0, 0x0, 0x0)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/sniffer/sniffer.go:350 +0xba0
-github.com/elastic/beats/packetbeat/beater.(*Packetbeat).Run.func1(0xc821248e60, 0xc82009ef00, 0xc821246f60)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/beater/packetbeat.go:247 +0x6d
-created by github.com/elastic/beats/packetbeat/beater.(*Packetbeat).Run
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/beater/packetbeat.go:251 +0x16b
-
-2016-07-01T14:31:45+08:00 ERR Sip ParseUdp. Recovering, but please report this: runtime error: invalid memory address or nil pointer dereference.
-2016-07-01T14:31:45+08:00 ERR Stacktrace: goroutine 59 [running]:
-runtime/debug.Stack(0x0, 0x0, 0x0)
-	/usr/local/go/src/runtime/debug/stack.go:24 +0x80
-github.com/elastic/beats/libbeat/logp.Recover(0x48f8470, 0xc)
-	/usr/local/go/src/github.com/elastic/beats/libbeat/logp/log.go:114 +0x166
-panic(0x47cc480, 0xc82000a130)
-	/usr/local/go/src/runtime/panic.go:443 +0x4e9
-github.com/elastic/beats/packetbeat/protos/sip.(*Sip).ParseUdp(0xc8201457c0, 0xc8215c6cc0)
-	/Users/xm/workgo/src/github.com/elastic/beats/packetbeat/protos/sip/sip_udp.go:38 +0xb6a
-github.com/elastic/beats/packetbeat/protos/udp.(*Udp).Process(0xc8211fd7c0, 0xc82124ecc0, 0xc8215c6cc0)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/protos/udp/udp.go:59 +0x429
-github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).onUDP(0xc8200ba400, 0xc8215c6cc0)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:295 +0x119
-github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).process(0xc8200ba400, 0xc8215c6cc0, 0x2d, 0x220, 0x0, 0x0)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:253 +0x5fd
-github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).OnPacket(0xc8200ba400, 0xc8213af92a, 0x220, 0x220, 0xc82164b080)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:164 +0x81f
-github.com/elastic/beats/packetbeat/sniffer.(*SnifferSetup).Run(0xc821246ae0, 0x0, 0x0)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/sniffer/sniffer.go:350 +0xba0
-github.com/elastic/beats/packetbeat/beater.(*Packetbeat).Run.func1(0xc821248e60, 0xc82009ef00, 0xc821246f60)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/beater/packetbeat.go:247 +0x6d
-created by github.com/elastic/beats/packetbeat/beater.(*Packetbeat).Run
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/beater/packetbeat.go:251 +0x16b
-
-2016-07-01T14:31:47+08:00 ERR Sip ParseUdp. Recovering, but please report this: runtime error: invalid memory address or nil pointer dereference.
-2016-07-01T14:31:47+08:00 ERR Stacktrace: goroutine 59 [running]:
-runtime/debug.Stack(0x0, 0x0, 0x0)
-	/usr/local/go/src/runtime/debug/stack.go:24 +0x80
-github.com/elastic/beats/libbeat/logp.Recover(0x48f8470, 0xc)
-	/usr/local/go/src/github.com/elastic/beats/libbeat/logp/log.go:114 +0x166
-panic(0x47cc480, 0xc82000a130)
-	/usr/local/go/src/runtime/panic.go:443 +0x4e9
-github.com/elastic/beats/packetbeat/protos/sip.(*Sip).ParseUdp(0xc8201457c0, 0xc82158cc00)
-	/Users/xm/workgo/src/github.com/elastic/beats/packetbeat/protos/sip/sip_udp.go:38 +0xb6a
-github.com/elastic/beats/packetbeat/protos/udp.(*Udp).Process(0xc8211fd7c0, 0xc82124ecc0, 0xc82158cc00)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/protos/udp/udp.go:59 +0x429
-github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).onUDP(0xc8200ba400, 0xc82158cc00)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:295 +0x119
-github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).process(0xc8200ba400, 0xc82158cc00, 0x2d, 0x220, 0x0, 0x0)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:253 +0x5fd
-github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).OnPacket(0xc8200ba400, 0xc8214027aa, 0x220, 0x220, 0xc8215c8660)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:164 +0x81f
-github.com/elastic/beats/packetbeat/sniffer.(*SnifferSetup).Run(0xc821246ae0, 0x0, 0x0)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/sniffer/sniffer.go:350 +0xba0
-github.com/elastic/beats/packetbeat/beater.(*Packetbeat).Run.func1(0xc821248e60, 0xc82009ef00, 0xc821246f60)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/beater/packetbeat.go:247 +0x6d
-created by github.com/elastic/beats/packetbeat/beater.(*Packetbeat).Run
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/beater/packetbeat.go:251 +0x16b
-
-2016-07-01T14:31:53+08:00 ERR Sip ParseUdp. Recovering, but please report this: runtime error: invalid memory address or nil pointer dereference.
-2016-07-01T14:31:53+08:00 ERR Stacktrace: goroutine 59 [running]:
-runtime/debug.Stack(0x0, 0x0, 0x0)
-	/usr/local/go/src/runtime/debug/stack.go:24 +0x80
-github.com/elastic/beats/libbeat/logp.Recover(0x48f8470, 0xc)
-	/usr/local/go/src/github.com/elastic/beats/libbeat/logp/log.go:114 +0x166
-panic(0x47cc480, 0xc82000a130)
-	/usr/local/go/src/runtime/panic.go:443 +0x4e9
-github.com/elastic/beats/packetbeat/protos/sip.(*Sip).ParseUdp(0xc8201457c0, 0xc8217f0a80)
-	/Users/xm/workgo/src/github.com/elastic/beats/packetbeat/protos/sip/sip_udp.go:38 +0xb6a
-github.com/elastic/beats/packetbeat/protos/udp.(*Udp).Process(0xc8211fd7c0, 0xc82124ecc0, 0xc8217f0a80)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/protos/udp/udp.go:59 +0x429
-github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).onUDP(0xc8200ba400, 0xc8217f0a80)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:295 +0x119
-github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).process(0xc8200ba400, 0xc8217f0a80, 0x2d, 0x4, 0x0, 0x0)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:253 +0x5fd
-github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).OnPacket(0xc8200ba400, 0xc8217b391a, 0x4, 0x4, 0xc8217b38c0)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:164 +0x81f
-github.com/elastic/beats/packetbeat/sniffer.(*SnifferSetup).Run(0xc821246ae0, 0x0, 0x0)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/sniffer/sniffer.go:350 +0xba0
-github.com/elastic/beats/packetbeat/beater.(*Packetbeat).Run.func1(0xc821248e60, 0xc82009ef00, 0xc821246f60)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/beater/packetbeat.go:247 +0x6d
-created by github.com/elastic/beats/packetbeat/beater.(*Packetbeat).Run
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/beater/packetbeat.go:251 +0x16b
-
-2016-07-01T14:32:03+08:00 ERR Sip ParseUdp. Recovering, but please report this: runtime error: invalid memory address or nil pointer dereference.
-2016-07-01T14:32:03+08:00 ERR Stacktrace: goroutine 59 [running]:
-runtime/debug.Stack(0x0, 0x0, 0x0)
-	/usr/local/go/src/runtime/debug/stack.go:24 +0x80
-github.com/elastic/beats/libbeat/logp.Recover(0x48f8470, 0xc)
-	/usr/local/go/src/github.com/elastic/beats/libbeat/logp/log.go:114 +0x166
-panic(0x47cc480, 0xc82000a130)
-	/usr/local/go/src/runtime/panic.go:443 +0x4e9
-github.com/elastic/beats/packetbeat/protos/sip.(*Sip).ParseUdp(0xc8201457c0, 0xc82198a540)
-	/Users/xm/workgo/src/github.com/elastic/beats/packetbeat/protos/sip/sip_udp.go:38 +0xb6a
-github.com/elastic/beats/packetbeat/protos/udp.(*Udp).Process(0xc8211fd7c0, 0xc82124ecc0, 0xc82198a540)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/protos/udp/udp.go:59 +0x429
-github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).onUDP(0xc8200ba400, 0xc82198a540)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:295 +0x119
-github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).process(0xc8200ba400, 0xc82198a540, 0x2d, 0x4, 0x0, 0x0)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:253 +0x5fd
-github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).OnPacket(0xc8200ba400, 0xc821970b6a, 0x4, 0x4, 0xc821970b10)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:164 +0x81f
-github.com/elastic/beats/packetbeat/sniffer.(*SnifferSetup).Run(0xc821246ae0, 0x0, 0x0)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/sniffer/sniffer.go:350 +0xba0
-github.com/elastic/beats/packetbeat/beater.(*Packetbeat).Run.func1(0xc821248e60, 0xc82009ef00, 0xc821246f60)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/beater/packetbeat.go:247 +0x6d
-created by github.com/elastic/beats/packetbeat/beater.(*Packetbeat).Run
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/beater/packetbeat.go:251 +0x16b
-
-2016-07-01T14:32:13+08:00 ERR Sip ParseUdp. Recovering, but please report this: runtime error: invalid memory address or nil pointer dereference.
-2016-07-01T14:32:13+08:00 ERR Stacktrace: goroutine 59 [running]:
-runtime/debug.Stack(0x0, 0x0, 0x0)
-	/usr/local/go/src/runtime/debug/stack.go:24 +0x80
-github.com/elastic/beats/libbeat/logp.Recover(0x48f8470, 0xc)
-	/usr/local/go/src/github.com/elastic/beats/libbeat/logp/log.go:114 +0x166
-panic(0x47cc480, 0xc82000a130)
-	/usr/local/go/src/runtime/panic.go:443 +0x4e9
-github.com/elastic/beats/packetbeat/protos/sip.(*Sip).ParseUdp(0xc8201457c0, 0xc821994600)
-	/Users/xm/workgo/src/github.com/elastic/beats/packetbeat/protos/sip/sip_udp.go:38 +0xb6a
-github.com/elastic/beats/packetbeat/protos/udp.(*Udp).Process(0xc8211fd7c0, 0xc82124ecc0, 0xc821994600)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/protos/udp/udp.go:59 +0x429
-github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).onUDP(0xc8200ba400, 0xc821994600)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:295 +0x119
-github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).process(0xc8200ba400, 0xc821994600, 0x2d, 0x4, 0x0, 0x0)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:253 +0x5fd
-github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).OnPacket(0xc8200ba400, 0xc821a1f3aa, 0x4, 0x4, 0xc821a1f350)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:164 +0x81f
-github.com/elastic/beats/packetbeat/sniffer.(*SnifferSetup).Run(0xc821246ae0, 0x0, 0x0)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/sniffer/sniffer.go:350 +0xba0
-github.com/elastic/beats/packetbeat/beater.(*Packetbeat).Run.func1(0xc821248e60, 0xc82009ef00, 0xc821246f60)
+github.com/elastic/beats/packetbeat/beater.(*Packetbeat).Run.func1(0xc82122f790, 0xc820080f00, 0xc82120d320)
 	/usr/local/go/src/github.com/elastic/beats/packetbeat/beater/packetbeat.go:247 +0x6d
 created by github.com/elastic/beats/packetbeat/beater.(*Packetbeat).Run
 	/usr/local/go/src/github.com/elastic/beats/packetbeat/beater/packetbeat.go:251 +0x16b

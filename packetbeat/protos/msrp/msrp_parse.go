@@ -2,13 +2,10 @@ package msrp
 
 import (
 	"bytes"
-	"errors"
-	"fmt"
-	"time"
-
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/streambuf"
-	"github.com/elastic/beats/libbeat/logp"
+	"time"
+	//"github.com/elastic/beats/libbeat/common/streambuf"
+	//"github.com/elastic/beats/libbeat/logp"
 )
 
 // MSRP Message
@@ -18,21 +15,25 @@ type message struct {
 	TCPTuple     common.TcpTuple
 	CmdlineTuple *common.CmdlineTuple
 	Direction    uint8
-
+	IsError      bool
+	headerOffset int
+	bodyOffset   int
 	//Request Info
 	TransactionID common.NetString
+	Method        common.NetString
 
-	Method common.NetString
+	Message common.NetString
 
 	//Response Info
-	StatusCode   uint16
+	StatusCode   common.NetString
 	StatusPhrase common.NetString
 
 	// Msrp Headers
-	ContentLength int
-	ContentType   common.NetString
-	Headers       map[string]common.NetString
-
+	Headers   map[string]common.NetString
+	ToPath    common.NetString
+	FromPath  common.NetString
+	MessageId common.NetString
+	Size      uint64
 	//Raw Data
 	Raw []byte
 
@@ -44,57 +45,46 @@ type message struct {
 
 	next *message
 }
+type parser struct {
+	config *parserConfig
+}
+
+type parserConfig struct {
+	SendHeaders    bool
+	SendAllHeaders bool
+}
 
 var (
-	transferEncodingChunked = []byte("chunked")
-
-	constCRLF = []byte("\r\n")
-
-	constClose     = []byte("close")
-	constKeepAlive = []byte("keep-alive")
-
-	nameContentLength    = []byte("content-length")
-	nameContentType      = []byte("content-type")
-	nameTransferEncoding = []byte("transfer-encoding")
-	nameConnection       = []byte("connection")
+	constCRLF     = []byte("\r\n")
+	nameToPath    = []byte("To-Path")
+	nameFromPath  = []byte("From-Path")
+	nameMessageId = []byte("Message-ID")
 )
 
 func newParser(config *parserConfig) *parser {
 	return &parser{config: config}
 }
-
-func (parser *parser) parse(s *stream) (bool, bool) {
+func (parser *parser) parse(s *MsrpStream) (bool, bool) {
 	m := s.message
 
 	for s.parseOffset < len(s.data) {
 		switch s.parseState {
-		case stateStart:
+		case msrpStateStart:
 			if cont, ok, complete := parser.parseMSRPLine(s, m); !cont {
 				return ok, complete
 			}
-		case stateHeaders:
+		case msrpStateHeaders:
 			if cont, ok, complete := parser.parseHeaders(s, m); !cont {
 				return ok, complete
 			}
-		case stateBody:
+		case msrpStateBody:
 			return parser.parseBody(s, m)
-		case stateBodyChunkedStart:
-			if cont, ok, complete := parser.parseBodyChunkedStart(s, m); !cont {
-				return ok, complete
-			}
-		case stateBodyChunked:
-			if cont, ok, complete := parser.parseBodyChunked(s, m); !cont {
-				return ok, complete
-			}
-		case stateBodyChunkedWaitFinalCRLF:
-			return parser.parseBodyChunkedWaitFinalCRLF(s, m)
 		}
 	}
 
 	return true, false
 }
-
-func (*parser) parseMSRPLine(s *stream, m *message) (cont, ok, complete bool) {
+func (*parser) parseMSRPLine(s *MsrpStream, m *message) (cont, ok, complete bool) {
 	m.start = s.parseOffset
 	i := bytes.Index(s.data[s.parseOffset:], []byte("\r\n"))
 	if i == -1 {
@@ -103,27 +93,31 @@ func (*parser) parseMSRPLine(s *stream, m *message) (cont, ok, complete bool) {
 
 	// Very basic tests on the first line. Just to check that
 	// we have what looks as an MSRP message
-	var version []byte
-	var err error
 	fline := s.data[s.parseOffset:i]
-	if len(fline) < 8 {
+	if len(fline) < 4 {
 		if isDebug {
 			debugf("First line too small")
 		}
 		return false, false, false
 	}
-	if bytes.Equal(fline[0:5], []byte("MSRP/")) {
+	if bytes.Equal(fline[0:4], []byte("MSRP")) {
 		//RESPONSE
 		m.IsRequest = false
-		version = fline[5:8]
-		m.StatusCode, m.StatusPhrase, err = parseResponseStatus(fline[9:])
-		if err != nil {
-			logp.Warn("Failed to understand MSRP response status: %s", fline[9:])
+		slices := bytes.Fields(fline)
+		if len(slices) != 4 {
+			if isDebug {
+				debugf("Couldn't understand MSRP response: %s", fline)
+			}
 			return false, false, false
 		}
+		m.IsRequest = false
+
+		m.TransactionID = common.NetString(slices[1])
+		m.StatusCode = common.NetString(slices[2])
+		m.StatusPhrase = common.NetString(slices[3])
 
 		if isDebug {
-			debugf("MSRP status_code=%d, status_phrase=%s", m.StatusCode, m.StatusPhrase)
+			debugf("MSRP transactionID=%s, status_code=%d, status_phrase=%s", m.TransactionID, m.StatusCode, m.StatusPhrase)
 		}
 	} else {
 		// REQUEST
@@ -135,12 +129,11 @@ func (*parser) parseMSRPLine(s *stream, m *message) (cont, ok, complete bool) {
 			return false, false, false
 		}
 
-		m.Method = common.NetString(slices[0])
-		m.RequestURI = common.NetString(slices[1])
-
-		if bytes.Equal(slices[2][:5], []byte("MSRP/")) {
+		m.TransactionID = common.NetString(slices[1])
+		m.Method = common.NetString(slices[2])
+		// TO DO
+		if bytes.Equal(slices[0], []byte("MSRP")) {
 			m.IsRequest = true
-			version = slices[2][5:]
 		} else {
 			if isDebug {
 				debugf("Couldn't understand MSRP version: %s", fline)
@@ -149,101 +142,23 @@ func (*parser) parseMSRPLine(s *stream, m *message) (cont, ok, complete bool) {
 		}
 	}
 
-	m.version.major, m.version.minor, err = parseVersion(version)
-	if err != nil {
-		if isDebug {
-			debugf("Failed to understand MSRP version: %v", version)
-		}
-		m.version.major = 1
-		m.version.minor = 0
-	}
-	if isDebug {
-		debugf("MSRP version %d.%d", m.version.major, m.version.minor)
-	}
-
 	// ok so far
 	s.parseOffset = i + 2
 	m.headerOffset = s.parseOffset
-	s.parseState = stateHeaders
-
+	s.parseState = msrpStateHeaders
 	return true, true, true
 }
-
-func parseResponseStatus(s []byte) (uint16, []byte, error) {
-	if isDebug {
-		debugf("parseResponseStatus: %s", s)
-	}
-
-	p := bytes.IndexByte(s, ' ')
-	if p == -1 {
-		return 0, nil, errors.New("Not able to identify status code")
-	}
-
-	code, _ := parseInt(s[0:p])
-
-	p = bytes.LastIndexByte(s, ' ')
-	if p == -1 {
-		return uint16(code), nil, errors.New("Not able to identify status code")
-	}
-	phrase := s[p+1:]
-	return uint16(code), phrase, nil
-}
-
-func parseVersion(s []byte) (uint8, uint8, error) {
-	if len(s) < 3 {
-		return 0, 0, errors.New("Invalid version")
-	}
-
-	major := s[0] - '0'
-	minor := s[2] - '0'
-	if major > 1 || minor > 2 {
-		return 0, 0, errors.New("unsupported version")
-	}
-	return uint8(major), uint8(minor), nil
-}
-
-func (parser *parser) parseHeaders(s *stream, m *message) (cont, ok, complete bool) {
+func (parser *parser) parseHeaders(s *MsrpStream, m *message) (cont, ok, complete bool) {
 	if len(s.data)-s.parseOffset >= 2 &&
 		bytes.Equal(s.data[s.parseOffset:s.parseOffset+2], []byte("\r\n")) {
 		// EOH
 		s.parseOffset += 2
 		m.bodyOffset = s.parseOffset
 
-		if !m.IsRequest && ((100 <= m.StatusCode && m.StatusCode < 200) || m.StatusCode == 204 || m.StatusCode == 304) {
-			//response with a 1xx, 204 , or 304 status  code is always terminated
-			// by the first empty line after the  header fields
-			if isDebug {
-				debugf("Terminate response, status code %d", m.StatusCode)
-			}
-			m.end = s.parseOffset
-			m.Size = uint64(m.end - m.start)
-			return false, true, true
-		}
-
-		if bytes.Equal(m.TransferEncoding, transferEncodingChunked) {
-			// support for MSRP/1.1 Chunked transfer
-			// Transfer-Encoding overrides the Content-Length
-			if isDebug {
-				debugf("Read chunked body")
-			}
-			s.parseState = stateBodyChunkedStart
-			return true, true, true
-		}
-
-		if m.ContentLength == 0 && (m.IsRequest || m.hasContentLength) {
-			if isDebug {
-				debugf("Empty content length, ignore body")
-			}
-			// Ignore body for request that contains a message body but not a Content-Length
-			m.end = s.parseOffset
-			m.Size = uint64(m.end - m.start)
-			return false, true, true
-		}
-
 		if isDebug {
 			debugf("Read body")
 		}
-		s.parseState = stateBody
+		s.parseState = msrpStateBody
 	} else {
 		ok, hfcomplete, offset := parser.parseHeader(m, s.data[s.parseOffset:])
 		if !ok {
@@ -267,7 +182,7 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 		return true, false, 0
 	}
 
-	config := parser.config
+	//config := parser.config
 
 	// enabled if required. Allocs for parameters slow down parser big times
 	if isDetailed {
@@ -292,44 +207,14 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 			if isDebug {
 				debugf("Header: '%s' Value: '%s'\n", data[:i], headerVal)
 			}
+			if bytes.Equal(headerName, nameToPath) {
+				m.ToPath = common.NetString(headerVal)
 
-			// Headers we need for parsing. Make sure we always
-			// capture their value
-			if bytes.Equal(headerName, nameContentLength) {
-				m.ContentLength, _ = parseInt(headerVal)
-				m.hasContentLength = true
-			} else if bytes.Equal(headerName, nameContentType) {
-				m.ContentType = headerVal
-			} else if bytes.Equal(headerName, nameTransferEncoding) {
-				m.TransferEncoding = common.NetString(headerVal)
-			} else if bytes.Equal(headerName, nameConnection) {
-				m.connection = headerVal
+			} else if bytes.Equal(headerName, nameFromPath) {
+				m.FromPath = common.NetString(headerVal)
+			} else if bytes.Equal(headerName, nameMessageId) {
+				m.MessageId = common.NetString(headerVal)
 			}
-			if len(config.RealIPHeader) > 0 && bytes.Equal(headerName, []byte(config.RealIPHeader)) {
-				if ips := bytes.SplitN(headerVal, []byte{','}, 2); len(ips) > 0 {
-					m.RealIP = trim(ips[0])
-				}
-			}
-
-			if config.SendHeaders {
-				if !config.SendAllHeaders {
-					_, exists := config.HeadersWhitelist[string(headerName)]
-					if !exists {
-						return true, true, p + 2
-					}
-				}
-				if val, ok := m.Headers[string(headerName)]; ok {
-					composed := make([]byte, len(val)+len(headerVal)+2)
-					off := copy(composed, val)
-					off = copy(composed[off:], []byte(", "))
-					copy(composed[off:], headerVal)
-
-					m.Headers[string(headerName)] = composed
-				} else {
-					m.Headers[string(headerName)] = headerVal
-				}
-			}
-
 			return true, true, p + 2
 		}
 	}
@@ -337,114 +222,10 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 	return true, false, len(data)
 }
 
-func (*parser) parseBody(s *stream, m *message) (ok, complete bool) {
-	if isDebug {
-		debugf("eat body: %d", s.parseOffset)
-	}
-	if !m.hasContentLength && (bytes.Equal(m.connection, constClose) ||
-		(isVersion(m.version, 1, 0) && !bytes.Equal(m.connection, constKeepAlive))) {
+func (*parser) parseBody(s *MsrpStream, m *message) (ok, complete bool) {
 
-		// MSRP/1.0 no content length. Add until the end of the connection
-		if isDebug {
-			debugf("close connection, %d", len(s.data)-s.parseOffset)
-		}
-		s.bodyReceived += (len(s.data) - s.parseOffset)
-		m.ContentLength += (len(s.data) - s.parseOffset)
-		s.parseOffset = len(s.data)
-		return true, false
-	} else if len(s.data[s.parseOffset:]) >= m.ContentLength-s.bodyReceived {
-		s.parseOffset += (m.ContentLength - s.bodyReceived)
-		m.end = s.parseOffset
-		m.Size = uint64(m.end - m.start)
-		return true, true
-	} else {
-		s.bodyReceived += (len(s.data) - s.parseOffset)
-		s.parseOffset = len(s.data)
-		if isDebug {
-			debugf("bodyReceived: %d", s.bodyReceived)
-		}
-		return true, false
-	}
+	return true, false
 }
-
-func (*parser) parseBodyChunkedStart(s *stream, m *message) (cont, ok, complete bool) {
-	// read hexa length
-	i := bytes.Index(s.data[s.parseOffset:], constCRLF)
-	if i == -1 {
-		return false, true, false
-	}
-	line := string(s.data[s.parseOffset : s.parseOffset+i])
-	_, err := fmt.Sscanf(line, "%x", &m.chunkedLength)
-	if err != nil {
-		logp.Warn("Failed to understand chunked body start line")
-		return false, false, false
-	}
-
-	s.parseOffset += i + 2 //+ \r\n
-	if m.chunkedLength == 0 {
-		if len(s.data[s.parseOffset:]) < 2 {
-			s.parseState = stateBodyChunkedWaitFinalCRLF
-			return false, true, false
-		}
-		if s.data[s.parseOffset] != '\r' || s.data[s.parseOffset+1] != '\n' {
-			logp.Warn("Expected CRLF sequence at end of message")
-			return false, false, false
-		}
-		s.parseOffset += 2 // skip final CRLF
-
-		m.end = s.parseOffset
-		m.Size = uint64(m.end - m.start)
-		return false, true, true
-	}
-	s.bodyReceived = 0
-	s.parseState = stateBodyChunked
-
-	return true, true, false
-}
-
-func (*parser) parseBodyChunked(s *stream, m *message) (cont, ok, complete bool) {
-
-	if len(s.data[s.parseOffset:]) >= m.chunkedLength-s.bodyReceived+2 /*\r\n*/ {
-		// Received more data than expected
-		m.chunkedBody = append(m.chunkedBody, s.data[s.parseOffset:s.parseOffset+m.chunkedLength-s.bodyReceived]...)
-		s.parseOffset += (m.chunkedLength - s.bodyReceived + 2 /*\r\n*/)
-		m.ContentLength += m.chunkedLength
-		s.parseState = stateBodyChunkedStart
-		return true, true, false
-	}
-
-	if len(s.data[s.parseOffset:]) >= m.chunkedLength-s.bodyReceived {
-		// we need need to wait for the +2, else we can crash on next call
-		return false, true, false
-	}
-
-	// Received less data than expected
-	m.chunkedBody = append(m.chunkedBody, s.data[s.parseOffset:]...)
-	s.bodyReceived += (len(s.data) - s.parseOffset)
-	s.parseOffset = len(s.data)
-	return false, true, false
-}
-
-func (*parser) parseBodyChunkedWaitFinalCRLF(s *stream, m *message) (ok, complete bool) {
-	if len(s.data[s.parseOffset:]) < 2 {
-		return true, false
-	}
-
-	if s.data[s.parseOffset] != '\r' || s.data[s.parseOffset+1] != '\n' {
-		logp.Warn("Expected CRLF sequence at end of message")
-		return false, false
-	}
-
-	s.parseOffset += 2 // skip final CRLF
-	m.end = s.parseOffset
-	m.Size = uint64(m.end - m.start)
-	return true, true
-}
-
-func isVersion(v version, major, minor uint8) bool {
-	return v.major == major && v.minor == minor
-}
-
 func trim(buf []byte) []byte {
 	return trimLeft(trimRight(buf))
 }
@@ -467,14 +248,6 @@ func trimRight(buf []byte) []byte {
 	}
 	return nil
 }
-
-func parseInt(line []byte) (int, error) {
-	buf := streambuf.NewFixed(line)
-	i, err := buf.AsciiInt(false)
-	return int(i), err
-	// TODO: is it an error if 'buf.Len() != 0 {}' ?
-}
-
 func toLower(buf, in []byte) []byte {
 	if len(in) > len(buf) {
 		goto unbufferedToLower
