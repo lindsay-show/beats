@@ -8,8 +8,6 @@ import (
 	"strings"
 )
 
-const MaxSipPacketSize = 65535 //(bytes)
-
 func (sip *Sip) ParseUdp(pkt *protos.Packet) {
 	defer logp.Recover("Sip ParseUdp")
 	packetSize := len(pkt.Payload)

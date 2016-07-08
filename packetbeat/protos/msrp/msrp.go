@@ -388,7 +388,8 @@ func (msrp *Msrp) newTransaction(requ, resp *message) common.MapStr {
 		Proc: string(requ.CmdlineTuple.Src),
 	}
 	dst := common.Endpoint{
-		Ip:   requ.TCPTuple.Dst_ip.String(),
+		Ip: requ.TCPTuple.Dst_ip.String(),
+
 		Port: requ.TCPTuple.Dst_port,
 		Proc: string(requ.CmdlineTuple.Dst),
 	}

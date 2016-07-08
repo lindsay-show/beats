@@ -11,7 +11,7 @@
 
 # Select the network interface to sniff the data. You can use the "any"
 # keyword to sniff on all connected interfaces.
-packetbeat.interfaces.device: en1
+packetbeat.interfaces.device: en0
 
 # Packetbeat supports three sniffer types:
 # * pcap, which uses the libpcap library and works on most platforms, but it's
@@ -41,8 +41,7 @@ packetbeat.interfaces.device: en1
 #packetbeat.interfaces.with_vlans: true
 
 # Use this setting to override the automatically generated BPF filter.
-#packetbeat.interfaces.bpf_filter:
-
+# packetbeat.interfaces.bpf_filter:  tcp[20:2]=0x4d53 and portrange 20000-24000 
 #================================== Flows =====================================
 
 # Set network flow timeout. Flow is killed if no packet is received before being
@@ -117,19 +116,20 @@ packetbeat.protocols.dns:
 
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
-  #transaction_timeout: 10s
-  #packetbeat.protocols.sip:
+  # transaction_timeout: 10s
+  packetbeat.protocols.sip:
   # Configure the ports where to listen for SIP traffic. You can disable
   # the SIP protocol by commenting out the list of ports.
-  # ports: [5060, 5260]
+  ports: [5060,5260]
   # send_request: true
   # send_response: true
 packetbeat.protocols.msrp:
-  # Configure the ports where to listen for SIP traffic. You can disable
-  # the SIP protocol by commenting out the list of ports.
-  enabled: true
+  # Configure the ports where to listen for MSRP traffic. You can disable
+  # the MSRP protocol by commenting out the list of ports.
+  ports: [1418]
   send_request: true
   send_response: true
+
 packetbeat.protocols.http:
   # Configure the ports where to listen for HTTP traffic. You can disable
   # the HTTP protocol by commenting out the list of ports.
@@ -864,7 +864,7 @@ output.elasticsearch:
 
 # Sets log level. The default log level is error.
 # Available log levels are: critical, error, warning, info, debug
-logging.level: error
+logging.level: debug
 
 # Enable debug output for selected components. To enable all selectors use ["*"]
 # Other available selectors are beat, publish, service

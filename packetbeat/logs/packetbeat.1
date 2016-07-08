@@ -1,25 +1,46 @@
-2016-07-05T11:29:47+08:00 ERR Sip ParseUdp. Recovering, but please report this: runtime error: invalid memory address or nil pointer dereference.
-2016-07-05T11:29:47+08:00 ERR Stacktrace: goroutine 34 [running]:
-runtime/debug.Stack(0x0, 0x0, 0x0)
-	/usr/local/go/src/runtime/debug/stack.go:24 +0x80
-github.com/elastic/beats/libbeat/logp.Recover(0x48f5340, 0xc)
-	/usr/local/go/src/github.com/elastic/beats/libbeat/logp/log.go:114 +0x166
-panic(0x47c9d00, 0xc82000a130)
-	/usr/local/go/src/runtime/panic.go:443 +0x4e9
-github.com/elastic/beats/packetbeat/protos/sip.(*Sip).ParseUdp(0xc82123a080, 0xc8212906c0)
-	/Users/xm/workgo/src/github.com/elastic/beats/packetbeat/protos/sip/sip_udp.go:47 +0x7e8
-github.com/elastic/beats/packetbeat/protos/udp.(*Udp).Process(0xc8212422c0, 0xc82123af00, 0xc8212906c0)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/protos/udp/udp.go:59 +0x429
-github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).onUDP(0xc82009c400, 0xc8212906c0)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:295 +0x119
-github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).process(0xc82009c400, 0xc8212906c0, 0x2d, 0x4, 0x0, 0x0)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:253 +0x5fd
-github.com/elastic/beats/packetbeat/decoder.(*DecoderStruct).OnPacket(0xc82009c400, 0xc8211dc65a, 0x4, 0x4, 0xc8211dc600)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/decoder/decoder.go:164 +0x81f
-github.com/elastic/beats/packetbeat/sniffer.(*SnifferSetup).Run(0xc82120cea0, 0x0, 0x0)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/sniffer/sniffer.go:350 +0xba0
-github.com/elastic/beats/packetbeat/beater.(*Packetbeat).Run.func1(0xc82122f790, 0xc820080f00, 0xc82120d320)
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/beater/packetbeat.go:247 +0x6d
-created by github.com/elastic/beats/packetbeat/beater.(*Packetbeat).Run
-	/usr/local/go/src/github.com/elastic/beats/packetbeat/beater/packetbeat.go:251 +0x16b
-
+2016-07-08T10:23:08+08:00 DBG  Disable stderr logging
+2016-07-08T10:23:08+08:00 INFO Home path: [/Users/xm/workgo/src/github.com/elastic/beats/packetbeat] Config path: [/Users/xm/workgo/src/github.com/elastic/beats/packetbeat] Data path: [/Users/xm/workgo/src/github.com/elastic/beats/packetbeat/data] Logs path: [/Users/xm/workgo/src/github.com/elastic/beats/packetbeat/logs]
+2016-07-08T10:23:08+08:00 DBG  configuration []
+2016-07-08T10:23:08+08:00 DBG  filters: 
+2016-07-08T10:23:08+08:00 DBG  Filters: 
+2016-07-08T10:23:08+08:00 INFO Setup Beat: packetbeat; Version: 5.0.0-SNAPSHOT
+2016-07-08T10:23:08+08:00 DBG  Initializing output plugins
+2016-07-08T10:23:08+08:00 INFO GeoIP disabled: No paths were set under shipper.geoip.paths
+2016-07-08T10:23:08+08:00 INFO Loading template enabled. Reading template file: /Users/xm/workgo/src/github.com/elastic/beats/packetbeat/packetbeat.template-es2x.json
+2016-07-08T10:23:08+08:00 INFO Activated elasticsearch as output plugin.
+2016-07-08T10:23:08+08:00 DBG  Create output worker
+2016-07-08T10:23:08+08:00 DBG  No output is defined to store the topology. The server fields might not be filled.
+2016-07-08T10:23:08+08:00 INFO Publisher name: XiaoMeng-MacMini.local
+2016-07-08T10:23:08+08:00 INFO Flush Interval set to: 1s
+2016-07-08T10:23:08+08:00 INFO Max Bulk Size set to: 50
+2016-07-08T10:23:08+08:00 DBG  create bulk processing worker (interval=1s, bulk size=50)
+2016-07-08T10:23:08+08:00 INFO Process matching disabled
+2016-07-08T10:23:08+08:00 DBG  Initializing protocol plugins
+2016-07-08T10:23:08+08:00 INFO registered protocol plugin: http
+2016-07-08T10:23:08+08:00 INFO registered protocol plugin: memcache
+2016-07-08T10:23:08+08:00 INFO registered protocol plugin: mongodb
+2016-07-08T10:23:08+08:00 INFO registered protocol plugin: msrp
+2016-07-08T10:23:08+08:00 INFO registered protocol plugin: redis
+2016-07-08T10:23:08+08:00 INFO registered protocol plugin: dns
+2016-07-08T10:23:08+08:00 INFO registered protocol plugin: mysql
+2016-07-08T10:23:08+08:00 INFO registered protocol plugin: nfs
+2016-07-08T10:23:08+08:00 INFO registered protocol plugin: pgsql
+2016-07-08T10:23:08+08:00 INFO registered protocol plugin: thrift
+2016-07-08T10:23:08+08:00 INFO registered protocol plugin: amqp
+2016-07-08T10:23:08+08:00 DBG  init memcache plugin
+2016-07-08T10:23:08+08:00 DBG  transaction timeout: 10s
+2016-07-08T10:23:08+08:00 DBG  udp transaction timeout: 10s
+2016-07-08T10:23:08+08:00 DBG  maxValues = 0
+2016-07-08T10:23:08+08:00 DBG  maxBytesPerValue = 2147483647
+2016-07-08T10:23:08+08:00 DBG  Init a MongoDB protocol parser
+2016-07-08T10:23:08+08:00 DBG  Initializing sniffer
+2016-07-08T10:23:08+08:00 DBG  Sniffer type: pcap device: en1
+2016-07-08T10:23:08+08:00 DBG  new flows worker. timeout=30s, period=10s, tick=10s, ticksTO=3, ticksP=1
+2016-07-08T10:23:08+08:00 DBG  Local IP addresses: [::1 127.0.0.1 fe80::1 200.200.1.13 fe80::26a0:74ff:fef4:97c 169.254.69.203 192.168.2.1 fe80::985a:ebff:fefc:e264]
+2016-07-08T10:23:08+08:00 DBG  tcp%!(EXTRA string=Port map: %v, map[uint16]protos.Protocol=map[2049:nfs 5672:amqp 27017:mongodb 8002:http 9090:thrift 3306:mysql 5432:pgsql 1418:msrp 5000:http 51273:msrp 8000:http 11211:memcache 6379:redis 53:dns 80:http 8080:http])
+2016-07-08T10:23:08+08:00 DBG  Port map: map[11211:memcache 53:dns]
+2016-07-08T10:23:08+08:00 DBG  register flow counter: net_packets_total
+2016-07-08T10:23:08+08:00 DBG  register flow counter: net_bytes_total
+2016-07-08T10:23:08+08:00 DBG  Layer type: Ethernet
+2016-07-08T10:23:08+08:00 DBG  BPF filter: 'tcp[20:2]=0x4d53 and tcp portrange 20000-24000'
+2016-07-08T10:23:08+08:00 INFO packetbeat cleanup

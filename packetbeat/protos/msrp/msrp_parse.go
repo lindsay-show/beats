@@ -3,21 +3,23 @@ package msrp
 import (
 	"bytes"
 	"github.com/elastic/beats/libbeat/common"
-	"time"
 	//"github.com/elastic/beats/libbeat/common/streambuf"
 	//"github.com/elastic/beats/libbeat/logp"
+	"time"
 )
 
 // MSRP Message
 type message struct {
-	Ts           time.Time
-	IsRequest    bool
-	TCPTuple     common.TcpTuple
-	CmdlineTuple *common.CmdlineTuple
-	Direction    uint8
-	IsError      bool
-	headerOffset int
-	bodyOffset   int
+	Ts             time.Time
+	hasContentType bool
+	IsRequest      bool
+	TCPTuple       common.TcpTuple
+	CmdlineTuple   *common.CmdlineTuple
+	Direction      uint8
+	IsError        bool
+	headerOffset   int
+	bodyOffset     int
+	Size           int
 	//Request Info
 	TransactionID common.NetString
 	Method        common.NetString
@@ -29,11 +31,11 @@ type message struct {
 	StatusPhrase common.NetString
 
 	// Msrp Headers
-	Headers   map[string]common.NetString
-	ToPath    common.NetString
-	FromPath  common.NetString
-	MessageId common.NetString
-	Size      uint64
+	Headers     map[string]common.NetString
+	ToPath      common.NetString
+	FromPath    common.NetString
+	MessageId   common.NetString
+	ContentType common.NetString
 	//Raw Data
 	Raw []byte
 
@@ -56,9 +58,9 @@ type parserConfig struct {
 
 var (
 	constCRLF     = []byte("\r\n")
-	nameToPath    = []byte("To-Path")
-	nameFromPath  = []byte("From-Path")
-	nameMessageId = []byte("Message-ID")
+	nameToPath    = []byte("to-path")
+	nameFromPath  = []byte("from-path")
+	nameMessageId = []byte("message-id")
 )
 
 func newParser(config *parserConfig) *parser {
@@ -100,46 +102,32 @@ func (*parser) parseMSRPLine(s *MsrpStream, m *message) (cont, ok, complete bool
 		}
 		return false, false, false
 	}
-	if bytes.Equal(fline[0:4], []byte("MSRP")) {
+	slices := bytes.Fields(fline)
+	if len(slices) == 4 || len(slices) == 5 {
 		//RESPONSE
-		m.IsRequest = false
-		slices := bytes.Fields(fline)
-		if len(slices) != 4 {
-			if isDebug {
-				debugf("Couldn't understand MSRP response: %s", fline)
-			}
-			return false, false, false
-		}
 		m.IsRequest = false
 
 		m.TransactionID = common.NetString(slices[1])
 		m.StatusCode = common.NetString(slices[2])
-		m.StatusPhrase = common.NetString(slices[3])
+		p := bytes.LastIndexByte(fline, ' ')
+		if p == -1 {
+			return false, false, false
+		}
+		m.StatusPhrase = fline[p+1:]
+		//m.StatusPhrase = common.NetString(slices[3])
 
 		if isDebug {
-			debugf("MSRP transactionID=%s, status_code=%d, status_phrase=%s", m.TransactionID, m.StatusCode, m.StatusPhrase)
+			debugf("MSRP transactionID=%s, status_code=%s, status_phrase=%s", m.TransactionID, m.StatusCode, m.StatusPhrase)
 		}
-	} else {
+	} else if len(slices) == 3 {
 		// REQUEST
-		slices := bytes.Fields(fline)
-		if len(slices) != 3 {
-			if isDebug {
-				debugf("Couldn't understand MSRP request: %s", fline)
-			}
-			return false, false, false
-		}
-
+		m.IsRequest = true
 		m.TransactionID = common.NetString(slices[1])
 		m.Method = common.NetString(slices[2])
-		// TO DO
-		if bytes.Equal(slices[0], []byte("MSRP")) {
-			m.IsRequest = true
-		} else {
-			if isDebug {
-				debugf("Couldn't understand MSRP version: %s", fline)
-			}
-			return false, false, false
+		if isDebug {
+			debugf("MSRP transactionID=%s, method=%s", m.TransactionID, m.Method)
 		}
+
 	}
 
 	// ok so far
@@ -182,8 +170,6 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 		return true, false, 0
 	}
 
-	//config := parser.config
-
 	// enabled if required. Allocs for parameters slow down parser big times
 	if isDetailed {
 		detailedf("Data: %s", data)
@@ -209,7 +195,6 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 			}
 			if bytes.Equal(headerName, nameToPath) {
 				m.ToPath = common.NetString(headerVal)
-
 			} else if bytes.Equal(headerName, nameFromPath) {
 				m.FromPath = common.NetString(headerVal)
 			} else if bytes.Equal(headerName, nameMessageId) {
@@ -221,7 +206,6 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 
 	return true, false, len(data)
 }
-
 func (*parser) parseBody(s *MsrpStream, m *message) (ok, complete bool) {
 
 	return true, false

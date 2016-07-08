@@ -265,6 +265,7 @@ func (sip *Sip) ConnectionTimeout() time.Duration {
 	return sip.transactionTimeout
 }
 func (sip *Sip) receivedSipRequest(tuple *SipTuple, msg *ReqSipMessage) {
+	debugf("Processing request. %s", tuple.String())
 	trans := sip.deleteTransaction(tuple.Hashable())
 	if trans != nil {
 		sip.publishTransaction(trans)
@@ -277,6 +278,7 @@ func (sip *Sip) receivedSipRequest(tuple *SipTuple, msg *ReqSipMessage) {
 }
 
 func (sip *Sip) receivedSipResponse(tuple *SipTuple, msg *RespSipMessage) {
+	debugf("Processing response. %s", tuple.String())
 	trans := sip.getTransaction(tuple.RevHashable())
 	if trans == nil {
 		trans = newTransaction(msg.Ts, tuple.Reverse(), common.CmdlineTuple{
