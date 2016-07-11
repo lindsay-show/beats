@@ -117,12 +117,12 @@ packetbeat.protocols.dns:
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
   # transaction_timeout: 10s
-  # packetbeat.protocols.sip:
+  packetbeat.protocols.sip:
   # Configure the ports where to listen for SIP traffic. You can disable
   # the SIP protocol by commenting out the list of ports.
-  # ports: [5060,5260]
-  # send_request: true
-  # send_response: true
+  ports: [5060,5260]
+  send_request: true
+  send_response: true
 packetbeat.protocols.msrp:
   # Configure the ports where to listen for MSRP traffic. You can disable
   # the MSRP protocol by commenting out the list of ports.
@@ -495,7 +495,7 @@ output.elasticsearch:
   #worker: 1
 
   # Optional index name. The default is "packetbeat" and generates
-  # [packetbeat-]YYYY.MM.DD keys.
+  #[packetbeat-]YYYY.MM.DD keys.
   #index: "packetbeat"
 
   # Optional HTTP Path
@@ -523,7 +523,7 @@ output.elasticsearch:
 
   # Boolean that sets if the topology is kept in Elasticsearch. The default is
   # false. This option makes sense only for Packetbeat.
-  #save_topology: false
+  # save_topology: true
 
   # The time to live in seconds for the topology information that is stored in
   # Elasticsearch. The default is 15 seconds.

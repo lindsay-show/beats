@@ -10,16 +10,17 @@ import (
 
 // MSRP Message
 type message struct {
-	Ts             time.Time
-	hasContentType bool
-	IsRequest      bool
-	TCPTuple       common.TcpTuple
-	CmdlineTuple   *common.CmdlineTuple
-	Direction      uint8
-	IsError        bool
-	headerOffset   int
-	bodyOffset     int
-	Size           int
+	Ts               time.Time
+	hasContentType   bool
+	hasContentLength bool
+	IsRequest        bool
+	TCPTuple         common.TcpTuple
+	CmdlineTuple     *common.CmdlineTuple
+	Direction        uint8
+	IsError          bool
+	headerOffset     int
+	bodyOffset       int
+	Size             uint64
 	//Request Info
 	TransactionID common.NetString
 	Method        common.NetString
@@ -31,11 +32,12 @@ type message struct {
 	StatusPhrase common.NetString
 
 	// Msrp Headers
-	Headers     map[string]common.NetString
-	ToPath      common.NetString
-	FromPath    common.NetString
-	MessageId   common.NetString
-	ContentType common.NetString
+	Headers       map[string]common.NetString
+	ToPath        common.NetString
+	FromPath      common.NetString
+	MessageId     common.NetString
+	ContentLength int
+	ContentType   common.NetString
 	//Raw Data
 	Raw []byte
 
@@ -142,6 +144,21 @@ func (parser *parser) parseHeaders(s *MsrpStream, m *message) (cont, ok, complet
 		// EOH
 		s.parseOffset += 2
 		m.bodyOffset = s.parseOffset
+		if !m.IsRequest {
+			m.end = s.parseOffset
+			m.Size = uint64(m.end - m.start)
+			return false, true, true
+		}
+
+		if m.ContentLength == 0 && (m.IsRequest || m.hasContentLength) {
+			if isDebug {
+				debugf("Empty content length, ignore body")
+			}
+			// Ignore body for request that contains a message body but not a Content-Length
+			m.end = s.parseOffset
+			m.Size = uint64(m.end - m.start)
+			return false, true, true
+		}
 
 		if isDebug {
 			debugf("Read body")
