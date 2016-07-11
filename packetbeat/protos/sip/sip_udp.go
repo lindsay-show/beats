@@ -27,6 +27,7 @@ func (sip *Sip) ParseUdp(pkt *protos.Packet) {
 	buf := bufio.NewReader(sipload)
 	if sipPkt.Response {
 		msg, _ := ReadResponseMessage(buf)
+		debugf("response: %v", msg.GetHeader())
 		respsipPkt := NewResponse(msg.GetStatusCode(), msg.GetReasonPhrase(), nil)
 
 		respsipMsg := &RespSipMessage{

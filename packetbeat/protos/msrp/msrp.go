@@ -5,7 +5,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
@@ -46,7 +45,7 @@ type messageList struct {
 // Msrp application level protocol analyser plugin.
 type Msrp struct {
 	// config
-	Ports              []int
+	Range              PortRange
 	SendRequest        bool
 	SendResponse       bool
 	parserConfig       parserConfig
@@ -94,7 +93,8 @@ func (msrp *Msrp) init(results publish.Transactions, config *msrpConfig) error {
 }
 
 func (msrp *Msrp) setFromConfig(config *msrpConfig) error {
-	msrp.Ports = config.Ports
+	//msrp.Ports = config.Ports
+	msrp.Range = config.Ports.Range
 	msrp.SendRequest = config.SendRequest
 	msrp.SendResponse = config.SendResponse
 	msrp.transactionTimeout = config.TransactionTimeout
@@ -103,7 +103,14 @@ func (msrp *Msrp) setFromConfig(config *msrpConfig) error {
 
 // GetPorts lists the port numbers the Msrp protocol analyser will handle.
 func (msrp *Msrp) GetPorts() []int {
-	return msrp.Ports
+	portrange := msrp.Range
+	first := portrange[0]
+	last := portrange[1]
+	ports := make([]int, 0, last-first+1)
+	for i := first; i <= last; i++ {
+		ports = append(ports, i)
+	}
+	return ports
 }
 
 // messageGap is called when a gap of size `nbytes` is found in the
@@ -416,10 +423,10 @@ func (msrp *Msrp) newTransaction(requ, resp *message) common.MapStr {
 	}
 
 	if msrp.SendRequest {
-		event["request"] = "string(msrp.cutMessageBody(requ)"
+		event["request"] = string(msrp.cutMessageBody(requ))
 	}
 	if msrp.SendResponse {
-		event["response"] = "string(msrp.cutMessageBody(resp))"
+		event["response"] = string(msrp.cutMessageBody(resp))
 	}
 	if len(requ.Notes)+len(resp.Notes) > 0 {
 		event["notes"] = append(requ.Notes, resp.Notes...)
@@ -434,7 +441,23 @@ func (msrp *Msrp) publishTransaction(event common.MapStr) {
 	}
 	msrp.results.PublishTransaction(event)
 }
+func (msrp *Msrp) cutMessageBody(m *message) []byte {
+	cutMsg := []byte{}
 
+	// add headers always
+	cutMsg = m.Raw[:m.bodyOffset]
+
+	// add body
+	if len(m.ContentType) == 0 {
+
+		if isDebug {
+			debugf("Body to include: [%s]", m.Raw[m.bodyOffset:])
+		}
+		cutMsg = append(cutMsg, m.Raw[m.bodyOffset:]...)
+	}
+
+	return cutMsg
+}
 func (ml *messageList) append(msg *message) {
 	if ml.tail == nil {
 		ml.head = msg

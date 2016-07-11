@@ -210,6 +210,7 @@ func (*parser) parseBody(s *MsrpStream, m *message) (ok, complete bool) {
 
 	return true, false
 }
+
 func trim(buf []byte) []byte {
 	return trimLeft(trimRight(buf))
 }

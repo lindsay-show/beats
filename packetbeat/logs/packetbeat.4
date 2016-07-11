@@ -1,46 +1,132 @@
-2016-07-07T19:56:57+08:00 DBG  Disable stderr logging
-2016-07-07T19:56:57+08:00 INFO Home path: [/Users/xm/workgo/src/github.com/elastic/beats/packetbeat] Config path: [/Users/xm/workgo/src/github.com/elastic/beats/packetbeat] Data path: [/Users/xm/workgo/src/github.com/elastic/beats/packetbeat/data] Logs path: [/Users/xm/workgo/src/github.com/elastic/beats/packetbeat/logs]
-2016-07-07T19:56:57+08:00 DBG  configuration []
-2016-07-07T19:56:57+08:00 DBG  filters: 
-2016-07-07T19:56:57+08:00 DBG  Filters: 
-2016-07-07T19:56:57+08:00 INFO Setup Beat: packetbeat; Version: 5.0.0-SNAPSHOT
-2016-07-07T19:56:57+08:00 DBG  Initializing output plugins
-2016-07-07T19:56:57+08:00 INFO GeoIP disabled: No paths were set under shipper.geoip.paths
-2016-07-07T19:56:57+08:00 INFO Loading template enabled. Reading template file: /Users/xm/workgo/src/github.com/elastic/beats/packetbeat/packetbeat.template-es2x.json
-2016-07-07T19:56:57+08:00 INFO Activated elasticsearch as output plugin.
-2016-07-07T19:56:57+08:00 DBG  Create output worker
-2016-07-07T19:56:57+08:00 DBG  No output is defined to store the topology. The server fields might not be filled.
-2016-07-07T19:56:57+08:00 INFO Publisher name: XiaoMeng-MacMini.local
-2016-07-07T19:56:57+08:00 INFO Flush Interval set to: 1s
-2016-07-07T19:56:57+08:00 INFO Max Bulk Size set to: 50
-2016-07-07T19:56:57+08:00 DBG  create bulk processing worker (interval=1s, bulk size=50)
-2016-07-07T19:56:57+08:00 INFO Process matching disabled
-2016-07-07T19:56:57+08:00 DBG  Initializing protocol plugins
-2016-07-07T19:56:57+08:00 INFO registered protocol plugin: memcache
-2016-07-07T19:56:57+08:00 INFO registered protocol plugin: mongodb
-2016-07-07T19:56:57+08:00 INFO registered protocol plugin: mysql
-2016-07-07T19:56:57+08:00 INFO registered protocol plugin: thrift
-2016-07-07T19:56:57+08:00 INFO registered protocol plugin: pgsql
-2016-07-07T19:56:57+08:00 INFO registered protocol plugin: redis
-2016-07-07T19:56:57+08:00 INFO registered protocol plugin: amqp
-2016-07-07T19:56:57+08:00 INFO registered protocol plugin: dns
-2016-07-07T19:56:57+08:00 INFO registered protocol plugin: http
-2016-07-07T19:56:57+08:00 INFO registered protocol plugin: msrp
-2016-07-07T19:56:57+08:00 INFO registered protocol plugin: nfs
-2016-07-07T19:56:57+08:00 DBG  init memcache plugin
-2016-07-07T19:56:57+08:00 DBG  transaction timeout: 10s
-2016-07-07T19:56:57+08:00 DBG  udp transaction timeout: 10s
-2016-07-07T19:56:57+08:00 DBG  maxValues = 0
-2016-07-07T19:56:57+08:00 DBG  maxBytesPerValue = 2147483647
-2016-07-07T19:56:57+08:00 DBG  Init a MongoDB protocol parser
-2016-07-07T19:56:57+08:00 DBG  Initializing sniffer
-2016-07-07T19:56:57+08:00 DBG  Sniffer type: pcap device: en1
-2016-07-07T19:56:57+08:00 DBG  new flows worker. timeout=30s, period=10s, tick=10s, ticksTO=3, ticksP=1
-2016-07-07T19:56:57+08:00 DBG  Local IP addresses: [::1 127.0.0.1 fe80::1 200.200.1.13 fe80::26a0:74ff:fef4:97c 169.254.69.203 192.168.2.1 fe80::985a:ebff:fefc:e264]
-2016-07-07T19:56:57+08:00 DBG  tcp%!(EXTRA string=Port map: %v, map[uint16]protos.Protocol=map[11211:memcache 9090:thrift 5000:http 8002:http 5672:amqp 80:http 8000:http 53:dns 3306:mysql 6379:redis 2049:nfs 5432:pgsql 8080:http 27017:mongodb])
-2016-07-07T19:56:57+08:00 DBG  Port map: map[11211:memcache 53:dns]
-2016-07-07T19:56:57+08:00 DBG  register flow counter: net_packets_total
-2016-07-07T19:56:57+08:00 DBG  register flow counter: net_bytes_total
-2016-07-07T19:56:57+08:00 DBG  Layer type: Ethernet
-2016-07-07T19:56:57+08:00 DBG  BPF filter: ''
-2016-07-07T19:56:57+08:00 INFO packetbeat cleanup
+2016-07-11T14:07:40+08:00 DBG  Disable stderr logging
+2016-07-11T14:07:40+08:00 INFO Home path: [/Users/xm/workgo/src/github.com/elastic/beats/packetbeat] Config path: [/Users/xm/workgo/src/github.com/elastic/beats/packetbeat] Data path: [/Users/xm/workgo/src/github.com/elastic/beats/packetbeat/data] Logs path: [/Users/xm/workgo/src/github.com/elastic/beats/packetbeat/logs]
+2016-07-11T14:07:40+08:00 DBG  configuration []
+2016-07-11T14:07:40+08:00 DBG  filters: 
+2016-07-11T14:07:40+08:00 DBG  Filters: 
+2016-07-11T14:07:40+08:00 INFO Setup Beat: packetbeat; Version: 5.0.0-SNAPSHOT
+2016-07-11T14:07:40+08:00 DBG  Initializing output plugins
+2016-07-11T14:07:40+08:00 INFO GeoIP disabled: No paths were set under shipper.geoip.paths
+2016-07-11T14:07:40+08:00 INFO Loading template enabled. Reading template file: /Users/xm/workgo/src/github.com/elastic/beats/packetbeat/packetbeat.template-es2x.json
+2016-07-11T14:07:40+08:00 INFO Activated elasticsearch as output plugin.
+2016-07-11T14:07:40+08:00 DBG  Create output worker
+2016-07-11T14:07:40+08:00 DBG  No output is defined to store the topology. The server fields might not be filled.
+2016-07-11T14:07:40+08:00 INFO Publisher name: XiaoMeng-MacMini.local
+2016-07-11T14:07:40+08:00 INFO Flush Interval set to: 1s
+2016-07-11T14:07:40+08:00 INFO Max Bulk Size set to: 50
+2016-07-11T14:07:40+08:00 DBG  create bulk processing worker (interval=1s, bulk size=50)
+2016-07-11T14:07:40+08:00 INFO Process matching disabled
+2016-07-11T14:07:40+08:00 DBG  Initializing protocol plugins
+2016-07-11T14:07:40+08:00 INFO registered protocol plugin: thrift
+2016-07-11T14:07:40+08:00 INFO registered protocol plugin: http
+2016-07-11T14:07:40+08:00 INFO registered protocol plugin: mongodb
+2016-07-11T14:07:40+08:00 INFO registered protocol plugin: msrp
+2016-07-11T14:07:40+08:00 INFO registered protocol plugin: mysql
+2016-07-11T14:07:40+08:00 INFO registered protocol plugin: nfs
+2016-07-11T14:07:40+08:00 INFO registered protocol plugin: pgsql
+2016-07-11T14:07:40+08:00 INFO registered protocol plugin: redis
+2016-07-11T14:07:40+08:00 INFO registered protocol plugin: amqp
+2016-07-11T14:07:40+08:00 INFO registered protocol plugin: dns
+2016-07-11T14:07:40+08:00 INFO registered protocol plugin: memcache
+2016-07-11T14:07:40+08:00 DBG  Init a MongoDB protocol parser
+2016-07-11T14:07:40+08:00 DBG  init memcache plugin
+2016-07-11T14:07:40+08:00 DBG  transaction timeout: 10s
+2016-07-11T14:07:40+08:00 DBG  udp transaction timeout: 10s
+2016-07-11T14:07:40+08:00 DBG  maxValues = 0
+2016-07-11T14:07:40+08:00 DBG  maxBytesPerValue = 2147483647
+2016-07-11T14:07:40+08:00 ERR Failed to register protocol plugin: (assert) value of type 'object' not convertible into unsupported go type 'msrp.PortRange' accessing 'packetbeat.protocols.msrp.ports.range' (source:'/Users/xm/workgo/src/github.com/elastic/beats/packetbeat/packetbeat.yml')
+Trace:goroutine 1 [running]:
+runtime/debug.Stack(0x0, 0x0, 0x0)
+	/usr/local/go/src/runtime/debug/stack.go:24 +0x80
+github.com/elastic/beats/vendor/github.com/urso/ucfg.raiseCritical(0x5d40000, 0xc820070310, 0xc8200ac1c0, 0xde, 0x0, 0x0)
+	/usr/local/go/src/github.com/elastic/beats/vendor/github.com/urso/ucfg/error.go:128 +0x16f
+github.com/elastic/beats/vendor/github.com/urso/ucfg.raiseToTypeNotSupported(0x68d8340, 0xc8211a7800, 0x5d44080, 0x46577a0, 0x0, 0x0)
+	/usr/local/go/src/github.com/elastic/beats/vendor/github.com/urso/ucfg/error.go:246 +0x2fe
+github.com/elastic/beats/vendor/github.com/urso/ucfg.doReifyPrimitive(0x4891950, 0x6, 0x48c66e0, 0x8, 0x488afc0, 0x1, 0x0, 0x0, 0x0, 0x0, ...)
+	/usr/local/go/src/github.com/elastic/beats/vendor/github.com/urso/ucfg/reify.go:446 +0x859
+github.com/elastic/beats/vendor/github.com/urso/ucfg.reifyPrimitive(0x4891950, 0x6, 0x48c66e0, 0x8, 0x488afc0, 0x1, 0x0, 0x0, 0x0, 0x0, ...)
+	/usr/local/go/src/github.com/elastic/beats/vendor/github.com/urso/ucfg/reify.go:379 +0x447
+github.com/elastic/beats/vendor/github.com/urso/ucfg.reifyValue(0x4891950, 0x6, 0x48c66e0, 0x8, 0x488afc0, 0x1, 0x0, 0x0, 0x0, 0x0, ...)
+	/usr/local/go/src/github.com/elastic/beats/vendor/github.com/urso/ucfg/reify.go:230 +0xbc7
+github.com/elastic/beats/vendor/github.com/urso/ucfg.reifyMergeValue(0x4891950, 0x6, 0x48c66e0, 0x8, 0x488afc0, 0x1, 0x0, 0x0, 0x0, 0x0, ...)
+	/usr/local/go/src/github.com/elastic/beats/vendor/github.com/urso/ucfg/reify.go:241 +0xe69
+github.com/elastic/beats/vendor/github.com/urso/ucfg.reifyGetField(0xc8211a7920, 0x4891950, 0x6, 0x48c66e0, 0x8, 0x488afc0, 0x1, 0x0, 0x0, 0x0, ...)
+	/usr/local/go/src/github.com/elastic/beats/vendor/github.com/urso/ucfg/reify.go:150 +0x240
+github.com/elastic/beats/vendor/github.com/urso/ucfg.reifyStruct(0x4891950, 0x6, 0x48c66e0, 0x8, 0x488afc0, 0x1, 0x0, 0x4770480, 0xc8211bc4d8, 0x199, ...)
+	/usr/local/go/src/github.com/elastic/beats/vendor/github.com/urso/ucfg/reify.go:117 +0xb51
+github.com/elastic/beats/vendor/github.com/urso/ucfg.reifyMergeValue(0x4891950, 0x6, 0x48c66e0, 0x8, 0x488afc0, 0x1, 0x0, 0x0, 0x0, 0x0, ...)
+	/usr/local/go/src/github.com/elastic/beats/vendor/github.com/urso/ucfg/reify.go:285 +0xd7b
+github.com/elastic/beats/vendor/github.com/urso/ucfg.reifyGetField(0xc8211a7740, 0x4891950, 0x6, 0x48c66e0, 0x8, 0x488afc0, 0x1, 0x0, 0x0, 0x0, ...)
+	/usr/local/go/src/github.com/elastic/beats/vendor/github.com/urso/ucfg/reify.go:150 +0x240
+github.com/elastic/beats/vendor/github.com/urso/ucfg.reifyStruct(0x4891950, 0x6, 0x48c66e0, 0x8, 0x488afc0, 0x1, 0x0, 0x4795da0, 0xc8211bc480, 0x199, ...)
+	/usr/local/go/src/github.com/elastic/beats/vendor/github.com/urso/ucfg/reify.go:117 +0xb51
+github.com/elastic/beats/vendor/github.com/urso/ucfg.reifyInto(0x4891950, 0x6, 0x48c66e0, 0x8, 0x488afc0, 0x1, 0x0, 0x4795da0, 0xc8211bc480, 0x199, ...)
+	/usr/local/go/src/github.com/elastic/beats/vendor/github.com/urso/ucfg/reify.go:40 +0x304
+github.com/elastic/beats/vendor/github.com/urso/ucfg.(*Config).Unpack(0xc8211a7740, 0x46085e0, 0xc8211bc480, 0xc8211c58e0, 0x1, 0x1, 0x0, 0x0)
+	/usr/local/go/src/github.com/elastic/beats/vendor/github.com/urso/ucfg/reify.go:24 +0x338
+github.com/elastic/beats/libbeat/common.(*Config).Unpack(0xc8211a7740, 0x46085e0, 0xc8211bc480, 0x0, 0x0)
+	/usr/local/go/src/github.com/elastic/beats/libbeat/common/config.go:34 +0xc8
+github.com/elastic/beats/packetbeat/protos/msrp.New(0x463fe00, 0x68ddca0, 0xc8212b4200, 0xc8211a7740, 0x0, 0x0, 0x0, 0x0)
+	/Users/xm/workgo/src/github.com/elastic/beats/packetbeat/protos/msrp/msrp.go:74 +0xfe
+github.com/elastic/beats/packetbeat/protos.ProtocolsStruct.Init(0xc821199e00, 0xc821199e30, 0xc821199e60, 0x68ddc00, 0x68ddca0, 0xc8212b4200, 0xc82125de00, 0x0, 0x0)
+	/usr/local/go/src/github.com/elastic/beats/packetbeat/protos/protos.go:109 +0x697
+github.com/elastic/beats/packetbeat/beater.(*Packetbeat).Setup(0xc82009ef00, 0xc820061680, 0x0, 0x0)
+	/usr/local/go/src/github.com/elastic/beats/packetbeat/beater/packetbeat.go:155 +0x240
+github.com/elastic/beats/libbeat/beat.(*instance).setup(0xc8211ba900, 0x0, 0x0)
+	/usr/local/go/src/github.com/elastic/beats/libbeat/beat/beat.go:259 +0x423
+github.com/elastic/beats/libbeat/beat.(*instance).launch(0xc8211ba900, 0x1, 0x0, 0x0)
+	/usr/local/go/src/github.com/elastic/beats/libbeat/beat/beat.go:310 +0x132
+github.com/elastic/beats/libbeat/beat.Run(0x48bcf10, 0xa, 0x0, 0x0, 0x68d8148, 0xc82009ef00, 0x0, 0x0)
+	/usr/local/go/src/github.com/elastic/beats/libbeat/beat/beat.go:121 +0x72
+main.main()
+	/Users/xm/workgo/src/github.com/elastic/beats/packetbeat/main.go:28 +0xd5
+
+
+2016-07-11T14:07:40+08:00 INFO packetbeat cleanup
+2016-07-11T14:07:40+08:00 CRIT Exiting: Initializing protocol analyzers failed: (assert) value of type 'object' not convertible into unsupported go type 'msrp.PortRange' accessing 'packetbeat.protocols.msrp.ports.range' (source:'/Users/xm/workgo/src/github.com/elastic/beats/packetbeat/packetbeat.yml')
+Trace:goroutine 1 [running]:
+runtime/debug.Stack(0x0, 0x0, 0x0)
+	/usr/local/go/src/runtime/debug/stack.go:24 +0x80
+github.com/elastic/beats/vendor/github.com/urso/ucfg.raiseCritical(0x5d40000, 0xc820070310, 0xc8200ac1c0, 0xde, 0x0, 0x0)
+	/usr/local/go/src/github.com/elastic/beats/vendor/github.com/urso/ucfg/error.go:128 +0x16f
+github.com/elastic/beats/vendor/github.com/urso/ucfg.raiseToTypeNotSupported(0x68d8340, 0xc8211a7800, 0x5d44080, 0x46577a0, 0x0, 0x0)
+	/usr/local/go/src/github.com/elastic/beats/vendor/github.com/urso/ucfg/error.go:246 +0x2fe
+github.com/elastic/beats/vendor/github.com/urso/ucfg.doReifyPrimitive(0x4891950, 0x6, 0x48c66e0, 0x8, 0x488afc0, 0x1, 0x0, 0x0, 0x0, 0x0, ...)
+	/usr/local/go/src/github.com/elastic/beats/vendor/github.com/urso/ucfg/reify.go:446 +0x859
+github.com/elastic/beats/vendor/github.com/urso/ucfg.reifyPrimitive(0x4891950, 0x6, 0x48c66e0, 0x8, 0x488afc0, 0x1, 0x0, 0x0, 0x0, 0x0, ...)
+	/usr/local/go/src/github.com/elastic/beats/vendor/github.com/urso/ucfg/reify.go:379 +0x447
+github.com/elastic/beats/vendor/github.com/urso/ucfg.reifyValue(0x4891950, 0x6, 0x48c66e0, 0x8, 0x488afc0, 0x1, 0x0, 0x0, 0x0, 0x0, ...)
+	/usr/local/go/src/github.com/elastic/beats/vendor/github.com/urso/ucfg/reify.go:230 +0xbc7
+github.com/elastic/beats/vendor/github.com/urso/ucfg.reifyMergeValue(0x4891950, 0x6, 0x48c66e0, 0x8, 0x488afc0, 0x1, 0x0, 0x0, 0x0, 0x0, ...)
+	/usr/local/go/src/github.com/elastic/beats/vendor/github.com/urso/ucfg/reify.go:241 +0xe69
+github.com/elastic/beats/vendor/github.com/urso/ucfg.reifyGetField(0xc8211a7920, 0x4891950, 0x6, 0x48c66e0, 0x8, 0x488afc0, 0x1, 0x0, 0x0, 0x0, ...)
+	/usr/local/go/src/github.com/elastic/beats/vendor/github.com/urso/ucfg/reify.go:150 +0x240
+github.com/elastic/beats/vendor/github.com/urso/ucfg.reifyStruct(0x4891950, 0x6, 0x48c66e0, 0x8, 0x488afc0, 0x1, 0x0, 0x4770480, 0xc8211bc4d8, 0x199, ...)
+	/usr/local/go/src/github.com/elastic/beats/vendor/github.com/urso/ucfg/reify.go:117 +0xb51
+github.com/elastic/beats/vendor/github.com/urso/ucfg.reifyMergeValue(0x4891950, 0x6, 0x48c66e0, 0x8, 0x488afc0, 0x1, 0x0, 0x0, 0x0, 0x0, ...)
+	/usr/local/go/src/github.com/elastic/beats/vendor/github.com/urso/ucfg/reify.go:285 +0xd7b
+github.com/elastic/beats/vendor/github.com/urso/ucfg.reifyGetField(0xc8211a7740, 0x4891950, 0x6, 0x48c66e0, 0x8, 0x488afc0, 0x1, 0x0, 0x0, 0x0, ...)
+	/usr/local/go/src/github.com/elastic/beats/vendor/github.com/urso/ucfg/reify.go:150 +0x240
+github.com/elastic/beats/vendor/github.com/urso/ucfg.reifyStruct(0x4891950, 0x6, 0x48c66e0, 0x8, 0x488afc0, 0x1, 0x0, 0x4795da0, 0xc8211bc480, 0x199, ...)
+	/usr/local/go/src/github.com/elastic/beats/vendor/github.com/urso/ucfg/reify.go:117 +0xb51
+github.com/elastic/beats/vendor/github.com/urso/ucfg.reifyInto(0x4891950, 0x6, 0x48c66e0, 0x8, 0x488afc0, 0x1, 0x0, 0x4795da0, 0xc8211bc480, 0x199, ...)
+	/usr/local/go/src/github.com/elastic/beats/vendor/github.com/urso/ucfg/reify.go:40 +0x304
+github.com/elastic/beats/vendor/github.com/urso/ucfg.(*Config).Unpack(0xc8211a7740, 0x46085e0, 0xc8211bc480, 0xc8211c58e0, 0x1, 0x1, 0x0, 0x0)
+	/usr/local/go/src/github.com/elastic/beats/vendor/github.com/urso/ucfg/reify.go:24 +0x338
+github.com/elastic/beats/libbeat/common.(*Config).Unpack(0xc8211a7740, 0x46085e0, 0xc8211bc480, 0x0, 0x0)
+	/usr/local/go/src/github.com/elastic/beats/libbeat/common/config.go:34 +0xc8
+github.com/elastic/beats/packetbeat/protos/msrp.New(0x463fe00, 0x68ddca0, 0xc8212b4200, 0xc8211a7740, 0x0, 0x0, 0x0, 0x0)
+	/Users/xm/workgo/src/github.com/elastic/beats/packetbeat/protos/msrp/msrp.go:74 +0xfe
+github.com/elastic/beats/packetbeat/protos.ProtocolsStruct.Init(0xc821199e00, 0xc821199e30, 0xc821199e60, 0x68ddc00, 0x68ddca0, 0xc8212b4200, 0xc82125de00, 0x0, 0x0)
+	/usr/local/go/src/github.com/elastic/beats/packetbeat/protos/protos.go:109 +0x697
+github.com/elastic/beats/packetbeat/beater.(*Packetbeat).Setup(0xc82009ef00, 0xc820061680, 0x0, 0x0)
+	/usr/local/go/src/github.com/elastic/beats/packetbeat/beater/packetbeat.go:155 +0x240
+github.com/elastic/beats/libbeat/beat.(*instance).setup(0xc8211ba900, 0x0, 0x0)
+	/usr/local/go/src/github.com/elastic/beats/libbeat/beat/beat.go:259 +0x423
+github.com/elastic/beats/libbeat/beat.(*instance).launch(0xc8211ba900, 0x1, 0x0, 0x0)
+	/usr/local/go/src/github.com/elastic/beats/libbeat/beat/beat.go:310 +0x132
+github.com/elastic/beats/libbeat/beat.Run(0x48bcf10, 0xa, 0x0, 0x0, 0x68d8148, 0xc82009ef00, 0x0, 0x0)
+	/usr/local/go/src/github.com/elastic/beats/libbeat/beat/beat.go:121 +0x72
+main.main()
+	/Users/xm/workgo/src/github.com/elastic/beats/packetbeat/main.go:28 +0xd5
+
+

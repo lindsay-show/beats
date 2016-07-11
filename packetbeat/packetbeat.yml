@@ -11,7 +11,7 @@
 
 # Select the network interface to sniff the data. You can use the "any"
 # keyword to sniff on all connected interfaces.
-packetbeat.interfaces.device: en0
+packetbeat.interfaces.device: any
 
 # Packetbeat supports three sniffer types:
 # * pcap, which uses the libpcap library and works on most platforms, but it's
@@ -117,16 +117,16 @@ packetbeat.protocols.dns:
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
   # transaction_timeout: 10s
-  packetbeat.protocols.sip:
+  # packetbeat.protocols.sip:
   # Configure the ports where to listen for SIP traffic. You can disable
   # the SIP protocol by commenting out the list of ports.
-  ports: [5060,5260]
+  # ports: [5060,5260]
   # send_request: true
   # send_response: true
 packetbeat.protocols.msrp:
   # Configure the ports where to listen for MSRP traffic. You can disable
   # the MSRP protocol by commenting out the list of ports.
-  ports: [1418]
+  ports.range : [20000, 24000]
   send_request: true
   send_response: true
 
@@ -540,7 +540,7 @@ output.elasticsearch:
   template.path: "packetbeat.template-es2x.json"
 
   # Overwrite existing template
-  template.overwrite: true
+  template.overwrite: false
 
   # TLS configuration. By default is off.
   # List of root certificates for HTTPS server verifications
